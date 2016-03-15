@@ -58,7 +58,7 @@ public final class Lists {
             }
         }
         System.out.println(end);
-        return Collections.unmodifiableList(end);
+        return Collections.unmodifiableList(new ArrayList<List<T>>(end));
     }
 
 }
