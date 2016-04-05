@@ -160,4 +160,8 @@ public final class Cell {
 				&& ((Cell) that).y() == this.y();
 	}
 
+	@Override 
+	public int hashCode(){
+		return rowMajorIndex();
+	}
 }

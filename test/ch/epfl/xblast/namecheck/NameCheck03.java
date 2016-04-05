@@ -61,7 +61,7 @@ abstract class NameCheck03 {
         p = new Player(pid, -1, c, -1, -1);
         pid = p.id();
         s = p.lifeStates();
-        Player.LifeState s1 = p.lifeStates();
+        Player.LifeState s1 = p.lifeState();
         s = p.statesForNextLife();
         int l = p.lives() + p.maxBombs() + p.bombRange();
         if (p.isAlive() || l > 2 || s1 != null)

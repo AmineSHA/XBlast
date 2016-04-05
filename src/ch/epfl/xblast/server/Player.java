@@ -9,30 +9,27 @@ import ch.epfl.xblast.SubCell;
 import ch.epfl.xblast.Cell;
 import ch.epfl.xblast.ArgumentChecker;
 
-public class Player {
+final public class Player {
 
-	PlayerID id;
-	private Sq<LifeState> lifeStates;
-	Sq<DirectedPosition> directedPos;
-	int maxBombs;
-	int bombRange;
+	private final PlayerID id;
+	private final Sq<LifeState> lifeStates;
+	private final Sq<DirectedPosition> directedPos;
+	private final int maxBombs;
+	private final int bombRange;
 
-	Player(PlayerID id, Sq<LifeState> lifeStates,
+	public Player(PlayerID id, Sq<LifeState> lifeStates,
 			Sq<DirectedPosition> directedPos, int maxBombs, int bombRange) {
-		ArgumentChecker.requireNonNegative(maxBombs);
-		ArgumentChecker.requireNonNegative(bombRange);
-		Objects.requireNonNull(id);
-		Objects.requireNonNull(lifeStates);
-		Objects.requireNonNull(directedPos);
-		this.id = id;
-		this.lifeStates = lifeStates;
-		this.directedPos = directedPos;
-		this.maxBombs = maxBombs;
-		this.bombRange = bombRange;
+
+		this.id = Objects.requireNonNull(id);
+		this.lifeStates = Objects.requireNonNull(lifeStates);
+		this.directedPos = Objects.requireNonNull(directedPos);
+		this.maxBombs = ArgumentChecker.requireNonNegative(maxBombs);
+		this.bombRange = ArgumentChecker.requireNonNegative(bombRange);
 
 	}
 
-	Player(PlayerID id, int lives, Cell position, int maxBombs, int bombRange) {
+	public Player(PlayerID id, int lives, Cell position, int maxBombs,
+			int bombRange) {
 		this(id, Sq.repeat(Ticks.PLAYER_INVULNERABLE_TICKS,
 				new LifeState(lives, LifeState.State.INVULNERABLE)).concat(
 				Sq.constant(new LifeState(lives, LifeState.State.VULNERABLE))),
@@ -46,20 +43,31 @@ public class Player {
 		return id;
 	}
 
-	Sq<LifeState> lifeStates() {
+	public Sq<LifeState> lifeStates() {
 		return lifeStates;
 	}
 
-	private Sq<LifeState> constructLifeStateSequence(int lives) {
+	public LifeState lifeState() {
+		return lifeStates().head();
+	}
+/**
+ * Basically is the method statesForNextLife I just thought it would be clearer to put this piece of code in another method
+ * 
+ * @param lives
+ * @returns à  sequence of LifeStates.
+ */
+	private Sq<LifeState> constructLifeStateSequence(int lives) {   
 		Sq<LifeState> dyingBasisSequence = Sq.repeat(Ticks.PLAYER_DYING_TICKS,
 				new LifeState(lives, LifeState.State.DYING));
-		
+
 		if (!isAlive()) {
-			return dyingBasisSequence.concat(Sq.constant(new LifeState(0, LifeState.State.DEAD)));
+			return dyingBasisSequence.concat(Sq.constant(new LifeState(0,
+					LifeState.State.DEAD)));
 		} else {
-			return dyingBasisSequence.concat(Sq.repeat(Ticks.PLAYER_INVULNERABLE_TICKS,
-					new LifeState(lives -1, LifeState.State.INVULNERABLE)).concat(
-					Sq.constant(new LifeState(lives - 1,
+			return dyingBasisSequence.concat(Sq.repeat(
+					Ticks.PLAYER_INVULNERABLE_TICKS,
+					new LifeState(lives - 1, LifeState.State.INVULNERABLE))
+					.concat(Sq.constant(new LifeState(lives - 1,
 							LifeState.State.VULNERABLE))));
 		}
 	}
@@ -90,16 +98,13 @@ public class Player {
 		return directedPos.head().direction();
 	}
 
-	int maxBombs() {
+	public int maxBombs() {
 		return maxBombs;
 	}
 
 	public Player withMaxBombs(int newMaxBombs) {
-		return new Player(
-				id,
-				Sq.constant(new LifeState(0, LifeState.State.DEAD)),
-				Sq.constant(new DirectedPosition(new SubCell(0, 0), Direction.S)),
-				0, 0);
+		return new Player(this.id, this.lifeStates, this.directedPos,
+				newMaxBombs, this.bombRange);
 	}
 
 	public int bombRange() {
@@ -107,11 +112,8 @@ public class Player {
 	}
 
 	public Player withBombRange(int newBombRange) {
-		return new Player(
-				id,
-				Sq.constant(new LifeState(0, LifeState.State.DEAD)),
-				Sq.constant(new DirectedPosition(new SubCell(0, 0), Direction.S)),
-				0, 0);
+		return new Player(this.id, this.lifeStates, this.directedPos,
+				this.maxBombs, newBombRange);
 	}
 
 	public Bomb newBomb() {
@@ -119,7 +121,7 @@ public class Player {
 				Ticks.BOMB_FUSE_TICKS, bombRange);
 	}
 
-	static class LifeState {
+	public static class LifeState {
 		public enum State {
 			INVULNERABLE, VULNERABLE, DYING, DEAD;
 		}
@@ -133,10 +135,8 @@ public class Player {
 		}
 
 		public boolean canMove() {
-			if (state == State.VULNERABLE || state == State.INVULNERABLE) {
-				return true;
-			}
-			return false;
+			return (state == State.VULNERABLE || state == State.INVULNERABLE);
+
 		}
 
 		public int lives() {
@@ -149,25 +149,21 @@ public class Player {
 
 	}
 
-	static class DirectedPosition {
+	public static class DirectedPosition {
 		private SubCell position;
 		private Direction direction;
 
 		public DirectedPosition(SubCell position, Direction direction) {
 
-			if (position == null || direction == null) {
-				throw new NullPointerException();
-			}
-
-			this.direction = direction;
-			this.position = position;
+			this.direction = Objects.requireNonNull(direction);
+			this.position = Objects.requireNonNull(position);
 		}
 
-		Sq<DirectedPosition> stopped(DirectedPosition p) {
+		public static Sq<DirectedPosition> stopped(DirectedPosition p) {
 			return Sq.constant(p);
 		}
 
-		Sq<DirectedPosition> moving(DirectedPosition p) {
+		public static Sq<DirectedPosition> moving(DirectedPosition p) {
 			return Sq.iterate(p, c -> {
 				return new DirectedPosition(c.position.neighbor((c.direction)),
 						p.direction);

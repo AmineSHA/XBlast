@@ -14,7 +14,7 @@ import ch.epfl.xblast.Direction;
  * @author Amine Chaouachi (260709) / Alban Favre (260025)
  *
  */
-public class Bomb {
+final public class Bomb {
 
     private final PlayerID ownerId;
     private final Cell position;
@@ -49,7 +49,7 @@ public class Bomb {
     
     public Bomb(PlayerID ownerId, Cell position, int fuseLength, int range) {
 
-        this(ownerId, position, Sq.iterate(fuseLength, u -> u - 1), range);
+        this(ownerId, position, Sq.iterate(fuseLength, u -> u - 1).takeWhile(u-> u>=0), range);
 
     }
 

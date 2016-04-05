@@ -36,7 +36,7 @@ public final class Lists {
         return basicTable;
     }
 
-    public static <T> List<List<T>> permutation(List<T> l) {
+    public static <T> List<List<T>> permutations(List<T> l) {
         List<List<T>> end = new ArrayList<List<T>>();
         switch (l.size()) {
         case 0:
@@ -46,7 +46,7 @@ public final class Lists {
             end.add(new ArrayList<T>(l));
             break;
         default:
-            List<List<T>> ll = permutation(l.subList(1, l.size()));
+            List<List<T>> ll = permutations(l.subList(1, l.size()));
             for (List<T> k : ll) {
 
                 for (int i = 0; i < k.size() + 1; i++) {

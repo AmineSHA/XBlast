@@ -2,8 +2,22 @@ package ch.epfl.xblast.server;
 
 public enum Block {
 
-	FREE, DESTRUCTIBLE_WALL, INDESTRUCTIBLE_WALL, CRUMBLING_WALL, BONUS_BOMB, BONUS_RANGE;
+	FREE, DESTRUCTIBLE_WALL, INDESTRUCTIBLE_WALL, CRUMBLING_WALL,
+	BONUS_RANGE(Bonus.INC_RANGE),
+	BONUS_BOMB(Bonus.INC_BOMB);
 
+
+	
+	
+	 private Bonus maybeAssociatedBonus;
+	 
+	 private Block(){
+		 maybeAssociatedBonus=null;
+	 }
+	 private Block(Bonus maybeAssociatedBonus){
+		 this.maybeAssociatedBonus=maybeAssociatedBonus;
+	 }
+	 
 	public boolean isFree() {
 		return (this.equals(FREE));
 
@@ -14,15 +28,15 @@ public enum Block {
 	}
 
 	public boolean castsShadow() {
-		return (this == DESTRUCTIBLE_WALL || this == INDESTRUCTIBLE_WALL || this == CRUMBLING_WALL);
+		return this.name().contains("_WALL");
 	}
 
 	public boolean isBonus() {
-		return (this.equals(BONUS_BOMB) || this.equals(BONUS_RANGE));
+		return this.name().contains("BONUS");
 	}
 
 	public Bonus associatedBonus() {
-       
+       return this.maybeAssociatedBonus;
 	}
 
 }

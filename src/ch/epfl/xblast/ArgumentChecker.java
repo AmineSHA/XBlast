@@ -5,7 +5,7 @@ package ch.epfl.xblast;
  * @author Amine Chaouachi (260709) / Alban Favre (260025)
  *
  */
-public class ArgumentChecker {
+ final public class ArgumentChecker {
 
     /**
      * 

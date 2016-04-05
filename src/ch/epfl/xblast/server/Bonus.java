@@ -19,7 +19,7 @@ public enum Bonus {
 
 	},
 	INC_RANGE {
-		public Player PlayerapplyTo(Player player) {
+		public Player applyTo(Player player) {
 			if (player.bombRange() < 9) {
 				return new Player(player.id(), player.lifeStates(),
 						player.directedPositions(), player.maxBombs(),
@@ -30,6 +30,6 @@ public enum Bonus {
 						player.bombRange());
 			}
 		}
-	}
-
+	};
+	abstract public Player applyTo(Player player);
 }
