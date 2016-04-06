@@ -7,10 +7,25 @@ package ch.epfl.xblast;
  */
 public enum Direction {
 
-    N, E, S, W;
+    /**
+     * North
+     */
+    N, 
+    /**
+     * East
+     */
+    E, 
+    /**
+     * South
+     */
+    S, 
+    /**
+     * West
+     */
+    W;
 
     /**
-     * find the opposite direction
+     * find the opposite direction of this
      * 
      * @return the opposite direction
      */
@@ -32,7 +47,7 @@ public enum Direction {
     }
 
     /**
-     * 
+     * Checks if the direction is E or W
      * @return true if it is horizontal
      */
     public boolean isHorizontal() {
@@ -40,8 +55,10 @@ public enum Direction {
     }
 
     /**
-     *
-     * @return true if it is parallel
+     * Checks if this is parallel to the parameter
+     * @param that
+     *       The direction which will be compared to this
+     * @return true if it is parallel to that
      */
     public boolean isParallelTo(Direction that) {
         return this == that || this == that.opposite();

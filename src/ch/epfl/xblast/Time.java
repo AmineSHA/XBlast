@@ -6,9 +6,21 @@ package ch.epfl.xblast;
  */
 public interface Time {
     
+    /**
+     * Seconds per minute
+     */
     public static int S_PER_MIN=60;
+    /**
+     * Milliseconds per second
+     */
     public static int MS_PER_S=1000;
+    /**
+     * Microseconds per second
+     */
     public static int US_PER_S=1000000;
+    /**
+     * nanoseconds per second
+     */
     public static int NS_PER_S=1000000000;
 
 }
