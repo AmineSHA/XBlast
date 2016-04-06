@@ -1,7 +1,5 @@
 package ch.epfl.xblast;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.lang.Math;
 import java.util.*;
 /**
@@ -11,17 +9,32 @@ import java.util.*;
  */
 public final class Cell {
 
-	final static public int COLUMNS = 15;
-	final static public int ROWS = 13;
-	final static public int COUNT = COLUMNS*ROWS;
-	final private int x;
-	final private int y;
+    /**
+     * columns number
+     */
+    final static public int COLUMNS = 15;
+    /**
+     * rows number
+     */
+    final static public int ROWS = 13;
+    /**
+     * cell total
+     */
+    final static public int COUNT = COLUMNS*ROWS;
+    final private int x;
+    final private int y;
 
-	public static final List<Cell> ROW_MAJOR_ORDER = Collections
-			.unmodifiableList(rowMajorOrder());
+    /**
+     * all cells organised in Row major order
+     */
+    public static final List<Cell> ROW_MAJOR_ORDER = Collections
+            .unmodifiableList(rowMajorOrder());
 
-	public static final List<Cell> SPIRAL_ORDER = Collections
-			.unmodifiableList(SpiralMajorOrder());
+    /**
+     * all cells organised in Spiral order
+     */
+    public static final List<Cell> SPIRAL_ORDER = Collections
+            .unmodifiableList(SpiralMajorOrder());
 
 	/**
      * Construct a Cell with x and y coordinate
@@ -107,7 +120,7 @@ public final class Cell {
 
 	}
     /**
-     * reorganizes Cells in spiral major order
+     * reorganises Cells in spiral major order
      * @returns an ArrayList of Cell organized in spiral major order
      */
 	public static ArrayList<Cell> SpiralMajorOrder() {

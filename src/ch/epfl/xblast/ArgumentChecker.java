@@ -7,16 +7,14 @@ package ch.epfl.xblast;
  */
  final public class ArgumentChecker {
 
-    /**
-     * 
-     */
     private ArgumentChecker() {
     }
 
     /**
-     * 
+     * verify that the value is positive, if not, well, you get an error
      * @param value
-     * @return
+     *          the value that will be checked
+     * @return the value that was tested
      */
     public static int requireNonNegative(int value) {
         if (value < 0)

@@ -2,41 +2,81 @@ package ch.epfl.xblast.server;
 
 public enum Block {
 
-	FREE, DESTRUCTIBLE_WALL, INDESTRUCTIBLE_WALL, CRUMBLING_WALL,
-	BONUS_RANGE(Bonus.INC_RANGE),
-	BONUS_BOMB(Bonus.INC_BOMB);
+    /**
+     * A free block
+     */
+    FREE,
+    /**
+     * a destructible wall
+     */
+    DESTRUCTIBLE_WALL,
+    /**
+     * an indestructible wall
+     */
+    INDESTRUCTIBLE_WALL,
+    /**
+     * a crumbling wall
+     */
+    CRUMBLING_WALL,
+    /**
+     * a bomb incremantor bonus
+     */
+    BONUS_RANGE(Bonus.INC_RANGE),
+    /**
+     * a range incremantor bonus
+     */
+    BONUS_BOMB(Bonus.INC_BOMB);
 
+    private Bonus maybeAssociatedBonus;
 
-	
-	
-	 private Bonus maybeAssociatedBonus;
-	 
-	 private Block(){
-		 maybeAssociatedBonus=null;
-	 }
-	 private Block(Bonus maybeAssociatedBonus){
-		 this.maybeAssociatedBonus=maybeAssociatedBonus;
-	 }
-	 
-	public boolean isFree() {
-		return (this.equals(FREE));
+    private Block() {
+        maybeAssociatedBonus = null;
+    }
 
-	}
+    private Block(Bonus maybeAssociatedBonus) {
+        this.maybeAssociatedBonus = maybeAssociatedBonus;
+    }
 
-	public boolean canHostPlayer() {
-		return (isFree() || isBonus());
-	}
+    /**
+     * checks if it's free
+     * @return true if it's free
+     */
+    public boolean isFree() {
+        return (this.equals(FREE));
 
-	public boolean castsShadow() {
-		return this.name().contains("_WALL");
-	}
+    }
 
-	public boolean isBonus() {
-		return this.name().contains("BONUS");
-	}
+    /**
+     * checks if it can host a player
+     * @return true if it can host player
+     */
 
-	public Bonus associatedBonus() {
-       return this.maybeAssociatedBonus;
-	}
+    public boolean canHostPlayer() {
+        return (isFree() || isBonus());
+    }
+
+    /**
+     * checks if it can cast shadow
+     * @return true if it can cast shadows
+     */
+    public boolean castsShadow() {
+        return this.name().contains("_WALL");
+    }
+
+    /**
+     * Check's if it is a bonus
+     * @return true if it's a bonus
+     */
+    public boolean isBonus() {
+        return this.name().contains("BONUS");
+    }
+
+    /**
+     * May associate a bonus to this
+     * @return a bonus or nothing
+     */
+    public Bonus associatedBonus() {
+        return this.maybeAssociatedBonus;
+    }
 
 }

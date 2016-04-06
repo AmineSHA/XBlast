@@ -36,6 +36,15 @@ public final class Lists {
         return basicTable;
     }
 
+    /**
+     * this method fill a list with lists of all possible permutations of
+     * objects of a given list, for example, the list[1,2,3] will create
+     * [[1,2,3],[2,1,3],[2,3,1],[1,3,2],[3,1,2],[3,2,1]]
+     * 
+     * @param l
+     *            the list that will be used as basis for permutations
+     * @return the list of lists of all possible permutation
+     */
     public static <T> List<List<T>> permutations(List<T> l) {
         List<List<T>> end = new ArrayList<List<T>>();
         switch (l.size()) {
@@ -57,7 +66,7 @@ public final class Lists {
                 }
             }
         }
-        System.out.println(end);
+
         return Collections.unmodifiableList(new ArrayList<List<T>>(end));
     }
 

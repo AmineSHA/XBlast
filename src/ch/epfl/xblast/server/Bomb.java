@@ -46,7 +46,17 @@ final public class Bomb {
 
     }
 
-    
+    /**
+     * The ingame bomb constructor
+     * @param ownerId
+     *          the bomb's ownerId
+     * @param position
+     *          the bomb's cell's position
+     * @param fuseLength
+     *          the bomb's fuse length 
+     * @param range
+     *          How far the bomb can burst
+     */
     public Bomb(PlayerID ownerId, Cell position, int fuseLength, int range) {
 
         this(ownerId, position, Sq.iterate(fuseLength, u -> u - 1).takeWhile(u-> u>=0), range);
