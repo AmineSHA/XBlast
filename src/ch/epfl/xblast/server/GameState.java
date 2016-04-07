@@ -263,15 +263,27 @@ final public class GameState {
      */
     public GameState next(Map<PlayerID, Optional<Direction>> speedChangeEvents,
             Set<PlayerID> bombDropEvents) {
+        
+        
+        
         List<Sq<Cell>> blasts1 = GameState.nextBlasts(this.blasts, this.board,
                 this.explosions);
-        List<Sq<Sq<Cell>>> explosions1 = new ArrayList<>();
-        Set<Cell> BLASTS = new HashSet<>();
-        for (Sq<Cell> s : blasts1) {
-            BLASTS.add(s.head());
-        }
+
+        
+        
         Set<Cell> consumedBonuses = new HashSet<>();
-        // board evolution type here
+        for (Player p : players) {
+            SubCell sub=p.position();
+            if(sub.isCentral()&&board.blockAt(sub.containingCell()).isBonus()){
+                consumedBonuses.add(sub.containingCell());
+            }
+        }
+        
+        Board board1 = nextBoard(this.board, consumedBonuses, blastedCells());
+
+        
+        
+        
         List<Sq<Sq<Cell>>> explosions1 = GameState
                 .nextExplosions(this.explosions);
 
@@ -279,19 +291,38 @@ final public class GameState {
                 bombDropEvents, this.bombs);
 
         for (Bomb b : this.bombs) {
-            if (!blastedCells().contains(b)
-                    ) {
+            if (!(b.fuseLength() == 0)) {// TODO si sa marche pas c'est ici le
+                                         // prob (== =<)
                 bombs1.add(b);
-                
+            }
 
-            } else if (!(b.fuseLength() == 0)) {
+            else if (!blastedCells().contains(b)) {
                 bombs1.add(b);
+
             } else {
-                
+                explosions1.addAll(b.explosion());
             }
 
         }
+        
+        
+        
+//        List<Player> nextPlayers(List<Player> players0,
+//                Map<PlayerID, Bonus> playerBonuses, Set<Cell> bombedCells1,
+//                Board board1, Set<Cell> blastedCells1,
+//                Map<PlayerID, Optional<Direction>> speedChangeEvents)
 
+        List<Player> Player1 = nextPlayers(this.players, playerBonuses, bombedCells1, board1, blastedCells1, speedChangeEvents);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     }
 
     /**
@@ -312,12 +343,12 @@ final public class GameState {
         for (Cell c : cellsRowMajorOrder) {
             if (consumedBonuses.contains(c)) {
                 boardArgument.add(Sq.constant(Block.FREE));
-            } else if (blastedCells1.contains(c)) {
+            } else if (blastedCells1.contains(c)
+                    && board0.blockAt(c) == Block.DESTRUCTIBLE_WALL) {
                 boardArgument.add(Sq
                         .repeat(Ticks.WALL_CRUMBLING_TICKS,
                                 Block.CRUMBLING_WALL)
-                        .concat(generateRandomSequence())); // TODO ca me semble
-                                                            // douteux
+                        .concat(generateRandomSequence()));
             } else if (board0.blockAt(c).name().contains("BONUS")
                     && blastedCells1.contains(c)) {
                 boardArgument.add(
