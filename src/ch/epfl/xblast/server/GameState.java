@@ -33,8 +33,9 @@ final public class GameState {
                     PlayerID.PLAYER_3, PlayerID.PLAYER_4));
 
     /**
-     * Generate a random block sequence
-     * 1/3 chance to get a bomb bonus block sequence, a range bonus block sequence or no bonus at all
+     * Generate a random block sequence 1/3 chance to get a bomb bonus block
+     * sequence, a range bonus block sequence or no bonus at all
+     * 
      * @return the corresponding sequence given the randomly generated number.
      */
     static private Sq<Block> generateRandomSequence() {
@@ -149,6 +150,7 @@ final public class GameState {
 
     /**
      * Compute remaining time
+     * 
      * @return the remaining time
      */
     public double remainingTime() {
@@ -157,6 +159,7 @@ final public class GameState {
 
     /**
      * the living players getter
+     * 
      * @return the current alive players list
      */
     public List<Player> alivePlayers() {
@@ -172,16 +175,16 @@ final public class GameState {
     }
 
     /**
-     * Create all the blasts needed for the next tick
-     *  Side Note : This method has been
-     *         done following the guidelines mentioned in the project. No other
-     *         techniques were used.
+     * Create all the blasts needed for the next tick Side Note : This method
+     * has been done following the guidelines mentioned in the project. No other
+     * techniques were used.
+     * 
      * @param blasts0
-     *           The current blasts
+     *            The current blasts
      * @param board0
-     *          the current board
+     *            the current board
      * @param explosions0
-     *          the current explosion
+     *            the current explosion
      * @return the blasts of the next Tick.
      */
     public static List<Sq<Cell>> nextBlasts(List<Sq<Cell>> blasts0,
@@ -203,6 +206,7 @@ final public class GameState {
 
     /**
      * associate a bomb and a Cell (which is returned)
+     * 
      * @return the map of the cells and the attached bomb
      */
     public Map<Cell, Bomb> bombedCells() {
@@ -216,7 +220,8 @@ final public class GameState {
 
     /**
      * associate a blast sequence and a Cell (which is returned)
-     * @return the map of the cells and the attached BlastS sequence
+     * 
+     * @return the map of the cells and the attached Blast set
      */
     public Set<Cell> blastedCells() {
         Set<Cell> blasted = new HashSet<Cell>();
@@ -224,15 +229,16 @@ final public class GameState {
         for (Sq<Cell> b : blasts) {
 
             blasted.add(b.head());
-        
+
         }
         return blasted;
     }
 
     /**
      * Create all the explosions needed for the next tick
+     * 
      * @param explosions0
-     *          All explosions of the current tick
+     *            All explosions of the current tick
      * @return the explosions for the next tick
      */
     private static List<Sq<Sq<Cell>>> nextExplosions(
@@ -250,77 +256,84 @@ final public class GameState {
      * Create the next tick GameState
      * 
      * @param speedChangeEvents
-     *          Player's direction change
+     *            Player's direction change
      * @param bombDropEvents
-     *          the PlayerID list of player who want to drop a bomb
+     *            the PlayerID list of player who want to drop a bomb
      * @return the next Gamestate
      */
-	public GameState next(Map<PlayerID, Optional<Direction>> speedChangeEvents,
-			Set<PlayerID> bombDropEvents) {
-		List<Sq<Cell>> blasts1 = GameState.nextBlasts(this.blasts, this.board,
-				this.explosions);
-		Set<Cell> BLASTS = new HashSet<>();
-		for (Sq<Cell> s : blasts1) {
-			BLASTS.add(s.head());
-		}
-		Set<Cell> consumedBonuses = new HashSet<>();
-		// board evolution type here
-		List<Sq<Sq<Cell>>> explosions1 = GameState
-				.nextExplosions(this.explosions);
+    public GameState next(Map<PlayerID, Optional<Direction>> speedChangeEvents,
+            Set<PlayerID> bombDropEvents) {
+        List<Sq<Cell>> blasts1 = GameState.nextBlasts(this.blasts, this.board,
+                this.explosions);
+        List<Sq<Sq<Cell>>> explosions1 = new ArrayList<>();
+        Set<Cell> BLASTS = new HashSet<>();
+        for (Sq<Cell> s : blasts1) {
+            BLASTS.add(s.head());
+        }
+        Set<Cell> consumedBonuses = new HashSet<>();
+        // board evolution type here
+        List<Sq<Sq<Cell>>> explosions1 = GameState
+                .nextExplosions(this.explosions);
 
-		List<Bomb> bombs1 = GameState.newlyDroppedBombs(this.players,
-				bombDropEvents, this.bombs);
+        List<Bomb> bombs1 = GameState.newlyDroppedBombs(this.players,
+                bombDropEvents, this.bombs);
 
-		for (Bomb b : this.bombs) {
-			if (!blastedCells().contains(b)
-					&& !(bombedCells().containsValue(b))) {
-				bombs1.add(b);
+        for (Bomb b : this.bombs) {
+            if (!blastedCells().contains(b)
+                    ) {
+                bombs1.add(b);
+                
 
-			} else if (!(b.fuseLength() == 0)) {
-				bombs1.add(b);
-			} else {
+            } else if (!(b.fuseLength() == 0)) {
+                bombs1.add(b);
+            } else {
+                
+            }
 
-			}
+        }
 
-		}
+    }
 
-	}
-
-	/**
+    /**
      * Create the next Board needed for the next tick
+     * 
      * @param board0
-     *          Current board
+     *            Current board
      * @param consumedBonuses
-     *          Bonuses which have been consumed this tick
+     *            Bonuses which have been consumed this tick
      * @param blastedCells1
-     *          The cells that will be blasted next tick
+     *            The cells that will be blasted next tick
      * @return the board for the next tick
      */
-	private static Board nextBoard(Board board0, Set<Cell> consumedBonuses,
-			Set<Cell> blastedCells1) {
-		List<Cell> cellsRowMajorOrder = Cell.ROW_MAJOR_ORDER;
-		List<Sq<Block>> boardArgument = new ArrayList<>();
-		for (Cell c : cellsRowMajorOrder) {
-			if (consumedBonuses.contains(c)) {
-				boardArgument.add(Sq.constant(Block.FREE));
-			} else if (blastedCells1.contains(c)) {
-				boardArgument.add(Sq.repeat(Ticks.WALL_CRUMBLING_TICKS,
-						Block.CRUMBLING_WALL).concat(generateRandomSequence()));
-			} else if (board0.blockAt(c).name().contains("BONUS")
-					&& blastedCells1.contains(c)) {
-				boardArgument.add(board0.blocksAt(c)
-						.limit(Ticks.BONUS_DISAPPEARING_TICKS)
-						.concat(Sq.constant(Block.FREE)));
-			} else {
-				boardArgument.add(board0.blocksAt(c));
+    private static Board nextBoard(Board board0, Set<Cell> consumedBonuses,
+            Set<Cell> blastedCells1) {
+        List<Cell> cellsRowMajorOrder = Cell.ROW_MAJOR_ORDER;
+        List<Sq<Block>> boardArgument = new ArrayList<>();
+        for (Cell c : cellsRowMajorOrder) {
+            if (consumedBonuses.contains(c)) {
+                boardArgument.add(Sq.constant(Block.FREE));
+            } else if (blastedCells1.contains(c)) {
+                boardArgument.add(Sq
+                        .repeat(Ticks.WALL_CRUMBLING_TICKS,
+                                Block.CRUMBLING_WALL)
+                        .concat(generateRandomSequence())); // TODO ca me semble
+                                                            // douteux
+            } else if (board0.blockAt(c).name().contains("BONUS")
+                    && blastedCells1.contains(c)) {
+                boardArgument.add(
+                        board0.blocksAt(c).limit(Ticks.BONUS_DISAPPEARING_TICKS)
+                                .concat(Sq.constant(Block.FREE)));
+            } else {
+                boardArgument.add(board0.blocksAt(c));
 
-			}
-		}
-		Board board1 = new Board(boardArgument);
+            }
+        }
+        Board board1 = new Board(boardArgument);
 
-		return board1;
-	}
-	/**
+        return board1;
+    }
+
+    /**
      * the method which will define which bomb can actually be dropped out of
      * all players that request a bomb drop
      * 
@@ -339,24 +352,22 @@ final public class GameState {
         for (Player t : players0) {
             if (bombDropEvents.contains(t.id())) {
                 if (t.lifeState().canMove()) {
-                    int currentBombNumberPlayer = 0;/* a dying player or a dead
-                                                     player cannot drop bomb */
+                    int currentBombNumberPlayer = 0;/*
+                                                     * a dying player or a dead
+                                                     * player cannot drop bomb
+                                                     */
                     for (Bomb b : bombs0) {
                         if (b.ownerId() == t.id()) {
                             currentBombNumberPlayer += 1;
                         }
                         if (b.position()
-                                    .equals(t.position().containingCell())) {
-                                currentBombNumberPlayer = t.maxBombs();/* a
-                                                                       player
-                                                                       cannot
-                                                                       put a second
-                                                                       bomb
-                                                                       on the
-                                                                       same
-                                                                       cell*/
+                                .equals(t.position().containingCell())) {
+                            currentBombNumberPlayer = t
+                                    .maxBombs();/*
+                                                 * a player cannot put a second
+                                                 * bomb on the same cell
+                                                 */
                         }
-                        
 
                     }
                     if (t.maxBombs() > currentBombNumberPlayer) {
@@ -402,55 +413,56 @@ final public class GameState {
 
     /**
      * Create the players for the next tick
+     * 
      * @param players0
-     *          current players
+     *            current players
      * @param playerBonuses
-     *          set of player and their bonuses
+     *            set of player and their bonuses
      * @param bombedCells1
-     *          the cell that will be bombed next tick
+     *            the cell that will be bombed next tick
      * @param board1
-     *          the board of the next tick
+     *            the board of the next tick
      * @param blastedCells1
-     *          the cells that will be blasted next tick
+     *            the cells that will be blasted next tick
      * @param speedChangeEvents
-     *          Player's direction change
+     *            Player's direction change
      * @return the list of players of the next tick
      */
-	private static List<Player> nextPlayers(List<Player> players0,
-			Map<PlayerID, Bonus> playerBonuses, Set<Cell> bombedCells1,
-			Board board1, Set<Cell> blastedCells1,
-			Map<PlayerID, Optional<Direction>> speedChangeEvents) {
-		List<Player> modifyPlayers = new ArrayList<>();
+    private static List<Player> nextPlayers(List<Player> players0,
+            Map<PlayerID, Bonus> playerBonuses, Set<Cell> bombedCells1,
+            Board board1, Set<Cell> blastedCells1,
+            Map<PlayerID, Optional<Direction>> speedChangeEvents) {
+        List<Player> modifyPlayers = new ArrayList<>();
 
-		for (Player c : players0) {
-			if (speedChangeEvents.get(c.id()).isPresent()) {
-				switch(speedChangeEvents.get(c.id()).get())
-				{
-				case N:
-					modifyPlayers.add(new Player(c.id(),c.lives(),Sq.iterate(c.directedPositions().head(),u->u.moving())));
-					
-				}
-			}
+        for (Player c : players0) {
+            if (speedChangeEvents.get(c.id()).isPresent()) {
+                switch (speedChangeEvents.get(c.id()).get()) {
+                case N:
+                    modifyPlayers.add(new Player(c.id(), c.lives(), Sq.iterate(
+                            c.directedPositions().head(), u -> u.moving())));
 
-			else {
+                }
+            }
 
-			}
+            else {
 
-		}
+            }
 
-		// Use the new lists !
+        }
 
-		// Player's state
-		for (Player c : players0) {
-			if (blastedCells1.contains(c.position().containingCell())) {
+        // Use the new lists !
 
-			}
-		}
-		// Bonuses ...
-		for (Player c : players0) {
+        // Player's state
+        for (Player c : players0) {
+            if (blastedCells1.contains(c.position().containingCell())) {
 
-			playerBonuses.get(c.id()).applyTo(c);
-		}
-	}
+            }
+        }
+        // Bonuses ...
+        for (Player c : players0) {
+
+            playerBonuses.get(c.id()).applyTo(c);
+        }
+    }
 
 }
