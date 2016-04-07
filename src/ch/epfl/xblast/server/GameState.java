@@ -269,13 +269,14 @@ final public class GameState {
         List<Sq<Cell>> blasts1 = GameState.nextBlasts(this.blasts, this.board,
                 this.explosions);
 
-        
+        Map<PlayerID, Bonus> playerBonuses1 = new HashMap<>();//this is used for nextplayer
         
         Set<Cell> consumedBonuses = new HashSet<>();
         for (Player p : players) {
             SubCell sub=p.position();
             if(sub.isCentral()&&board.blockAt(sub.containingCell()).isBonus()){
                 consumedBonuses.add(sub.containingCell());
+                playerBonuses1.put(p.id(), board.blockAt(sub.containingCell()).associatedBonus());
             }
         }
         
@@ -312,16 +313,18 @@ final public class GameState {
 //                Board board1, Set<Cell> blastedCells1,
 //                Map<PlayerID, Optional<Direction>> speedChangeEvents)
 
-        List<Player> Player1 = nextPlayers(this.players, playerBonuses, bombedCells1, board1, blastedCells1, speedChangeEvents);
+        Set<Cell> bombedCells1Set = new HashSet<>();
+        Map<Cell, Bomb> bombedCells1Map= bombedCells();
+        for (Cell z : bombedCells1Map.keySet()) {
+            bombedCells1Set.add(z);
+        }
         
         
+        List<Player> Player1 = nextPlayers(this.players, playerBonuses1, bombedCells1Set, board1, blastedCells(), speedChangeEvents);
         
         
-        
-        
-        
-        
-        
+        return new GameState(this.ticks+1, board1, Player1, bombs1, explosions1, blasts1);
+
         
     }
 
