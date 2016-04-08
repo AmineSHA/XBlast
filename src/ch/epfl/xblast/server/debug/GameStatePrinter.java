@@ -25,7 +25,7 @@ public final class GameStatePrinter {
      * UseANISChar, set to "true" to use ANIS escape characters or set to
      * "false" not to use ANSI escape characters
      */
-    private static boolean UseANSIChar = true;
+    private static boolean UseANSIChar = false;
 
     /**
      * DebugPlayers, set to "true" to have the player data be printed on the

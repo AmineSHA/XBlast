@@ -21,6 +21,12 @@ final public class Player {
 	private final int maxBombs;
 	private final int bombRange;
 
+	
+	@Override
+    public String toString() {
+        return "( " + id + ", " + lifeStates.head() + " ,"+   directedPos.head()   + " ,"+  maxBombs   + " ,"+    bombRange      +")";
+    }
+	
 	/**
      * Principal Player constructor
      * @param id
@@ -240,6 +246,10 @@ final public class Player {
             DEAD;
 		}
 
+		@Override
+	    public String toString() {
+	        return "( " +lives  +", "+  state  +")";
+	    }
 		int lives;
 		State state;
 
@@ -291,6 +301,10 @@ final public class Player {
 		private SubCell position;
 		private Direction direction;
 
+		@Override
+        public String toString() {
+            return "( " +position  +", "+  direction  +")";
+        }
 		/**
          * DirectedPosition constructor
          * @param position
