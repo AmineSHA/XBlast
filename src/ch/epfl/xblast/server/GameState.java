@@ -464,7 +464,9 @@ final public class GameState {
         for (Player c : players0) {
 
             PlayerID id = c.id();
-            Sq<DirectedPosition> dirPosSeq = Sq.constant(null);
+            
+            
+            Sq<DirectedPosition> dirPosSeq = c.directedPositions();
             boolean isBlocked = false;
 
             if (speedChangeEvents.containsKey(id)) {
@@ -500,30 +502,34 @@ final public class GameState {
                         dirPosSeq = DirectedPosition
                                 .moving(new DirectedPosition(c.position(),
                                         c.direction()));
-                        dirPosSeq = takewhileMeth(dirPosSeq, c.direction());
-                        dirPosSeq.concat((DirectedPosition.moving(findFirstMeth(
-                                dirPosSeq, speedChangeEvents.get(id).get()))));
+                        DirectedPosition cent=findFirstMeth(
+                                dirPosSeq, c.direction());
+                        cent=cent.withDirection(speedChangeEvents.get(id).get());
+                        
+                        dirPosSeq = takewhileMeth(dirPosSeq, c.direction()).concat((DirectedPosition.moving(cent)));
+                       
 
                     }
 
                     if (!isBlocked) {
                         dirPosSeq = dirPosSeq.tail();
                     }
+                    
 
                 } else if (!speedChangeEvents.get(id).isPresent()
                         && c.lifeState().canMove()) {
 
                     if (!board1
                             .blockAt(c.position().containingCell()
-                                    .neighbor(speedChangeEvents.get(id).get()))
-                            .canHostPlayer()) {
+                                    .neighbor(c.direction())
+                            ).canHostPlayer()) {
                         isBlocked = true;
                     }
 
                     if (bombedCells1.contains(c.position().containingCell())) {
                         if (c.position().distanceToCentral() == 6) {
                             if (c.position()
-                                    .neighbor(speedChangeEvents.get(id).get())
+                                    .neighbor(c.direction())
                                     .distanceToCentral() == 5) {
                                 isBlocked = true;
                             }
@@ -531,10 +537,17 @@ final public class GameState {
                     }
 
                     if (!isBlocked) {
-                        dirPosSeq = takewhileMeth(dirPosSeq, c.direction())
-                                .concat(DirectedPosition.stopped(
-                                        new DirectedPosition(c.position(),
-                                                c.direction())));
+                        dirPosSeq = DirectedPosition
+                                .moving(new DirectedPosition(c.position(),
+                                        c.direction()));
+                        DirectedPosition cent1=findFirstMeth(
+                                dirPosSeq, c.direction());
+                        
+                        
+                        dirPosSeq = takewhileMeth(dirPosSeq, c.direction()).concat((DirectedPosition.stopped(cent1)));
+                       
+                        
+                        
                         dirPosSeq = dirPosSeq.tail();
                     } else {
                         dirPosSeq = c.directedPositions();
@@ -579,22 +592,25 @@ final public class GameState {
     }
 
     /**
+     * applies takeWhile
      * @param j
      * @param d
-     * @return 
+     * @return Sq<DirectedPosition> 
      */
-    static public Sq<DirectedPosition> takewhileMeth(Sq<DirectedPosition> j,
+    static private Sq<DirectedPosition> takewhileMeth(Sq<DirectedPosition> j,
             Direction d) {
-        return j.takeWhile(u -> !(u.position().neighbor(d).isCentral()));
+        return j.takeWhile(u -> !(u.position().isCentral()));
     }
 
     /**
+     * applies findFirst
      * @param j
      * @param d
-     * @return
+     * @return DirectedPosition
      */
-    static public DirectedPosition findFirstMeth(Sq<DirectedPosition> j,
+    static private DirectedPosition findFirstMeth(Sq<DirectedPosition> j,
             Direction d) {
+        
         return j.findFirst(u -> u.position().isCentral()).withDirection(d);
     }
 

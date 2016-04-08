@@ -335,10 +335,7 @@ final public class Player {
 		 * @return the sequence of DirectedMovement of movement
 		 */
 		public static Sq<DirectedPosition> moving(DirectedPosition p) {
-			return Sq.iterate(p, c -> {
-				return new DirectedPosition(c.position.neighbor((c.direction)),
-						p.direction);
-			});
+			return Sq.iterate(p, c -> c.withPosition(c.position().neighbor(p.direction())));
 		}
 
 		/**
