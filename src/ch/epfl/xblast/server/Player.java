@@ -327,18 +327,36 @@ final public class Player {
 			});
 		}
 
+		/**
+		 * the position subcell getter
+		 * @return the current position
+		 */
 		public SubCell position() {
 			return position;
 		}
 
+		/**
+		 * the direction getter
+		 * @return the current direction
+		 */
 		public Direction direction() {
 			return direction;
 		}
 
+		/**
+		 * create a new directed position with a new position
+		 * @param newPosition
+		 * @return DirectedPostion of the new position
+		 */
 		public DirectedPosition withPosition(SubCell newPosition) {
 			return new DirectedPosition(newPosition, this.direction);
 		}
 
+		/**
+         * create a new directed position with a new Direction
+         * @param newDirection
+         * @return DirectedPostion with new direction
+         */
 		public DirectedPosition withDirection(Direction newDirection) {
 			return new DirectedPosition(this.position, newDirection);
 		}
