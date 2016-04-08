@@ -4,6 +4,10 @@ import ch.epfl.cs108.*;
 import ch.epfl.xblast.*;
 
 import ch.epfl.xblast.server.*;
+import ch.epfl.xblast.server.Player.DirectedPosition;
+import ch.epfl.xblast.server.Player.LifeState;
+import ch.epfl.xblast.server.Player.LifeState.State;
+
 import java.util.*;
 
 /**
@@ -263,28 +267,26 @@ final public class GameState {
      */
     public GameState next(Map<PlayerID, Optional<Direction>> speedChangeEvents,
             Set<PlayerID> bombDropEvents) {
-        
-        
-        
+
         List<Sq<Cell>> blasts1 = GameState.nextBlasts(this.blasts, this.board,
                 this.explosions);
 
-        Map<PlayerID, Bonus> playerBonuses1 = new HashMap<>();//this is used for nextplayer
-        
+        Map<PlayerID, Bonus> playerBonuses1 = new HashMap<>();// this is used
+                                                              // for nextplayer
+
         Set<Cell> consumedBonuses = new HashSet<>();
         for (Player p : players) {
-            SubCell sub=p.position();
-            if(sub.isCentral()&&board.blockAt(sub.containingCell()).isBonus()){
+            SubCell sub = p.position();
+            if (sub.isCentral()
+                    && board.blockAt(sub.containingCell()).isBonus()) {
                 consumedBonuses.add(sub.containingCell());
-                playerBonuses1.put(p.id(), board.blockAt(sub.containingCell()).associatedBonus());
+                playerBonuses1.put(p.id(),
+                        board.blockAt(sub.containingCell()).associatedBonus());
             }
         }
-        
+
         Board board1 = nextBoard(this.board, consumedBonuses, blastedCells());
 
-        
-        
-        
         List<Sq<Sq<Cell>>> explosions1 = GameState
                 .nextExplosions(this.explosions);
 
@@ -305,27 +307,24 @@ final public class GameState {
             }
 
         }
-        
-        
-        
-//        List<Player> nextPlayers(List<Player> players0,
-//                Map<PlayerID, Bonus> playerBonuses, Set<Cell> bombedCells1,
-//                Board board1, Set<Cell> blastedCells1,
-//                Map<PlayerID, Optional<Direction>> speedChangeEvents)
+
+        // List<Player> nextPlayers(List<Player> players0,
+        // Map<PlayerID, Bonus> playerBonuses, Set<Cell> bombedCells1,
+        // Board board1, Set<Cell> blastedCells1,
+        // Map<PlayerID, Optional<Direction>> speedChangeEvents)
 
         Set<Cell> bombedCells1Set = new HashSet<>();
-        Map<Cell, Bomb> bombedCells1Map= bombedCells();
+        Map<Cell, Bomb> bombedCells1Map = bombedCells();
         for (Cell z : bombedCells1Map.keySet()) {
             bombedCells1Set.add(z);
         }
-        
-        
-        List<Player> Player1 = nextPlayers(this.players, playerBonuses1, bombedCells1Set, board1, blastedCells(), speedChangeEvents);
-        
-        
-        return new GameState(this.ticks+1, board1, Player1, bombs1, explosions1, blasts1);
 
-        
+        List<Player> Player1 = nextPlayers(this.players, playerBonuses1,
+                bombedCells1Set, board1, blastedCells(), speedChangeEvents);
+
+        return new GameState(this.ticks + 1, board1, Player1, bombs1,
+                explosions1, blasts1);
+
     }
 
     /**
@@ -467,36 +466,117 @@ final public class GameState {
             Board board1, Set<Cell> blastedCells1,
             Map<PlayerID, Optional<Direction>> speedChangeEvents) {
         List<Player> modifyPlayers = new ArrayList<>();
+        Map<PlayerID, Sq<DirectedPosition>> DirPosSeqTemp=new HashMap<>();
+        
 
         for (Player c : players0) {
-            if (speedChangeEvents.get(c.id()).isPresent()) {
-                switch (speedChangeEvents.get(c.id()).get()) {
-                case N:
-                    modifyPlayers.add(new Player(c.id(), c.lives(), Sq.iterate(
-                            c.directedPositions().head(), u -> u.moving())));
+            PlayerID id = c.id();
+            Sq<DirectedPosition> dirPosSeq=Sq.constant(null);
+            boolean isBlocked=false;
+            if (speedChangeEvents.get(id).isPresent()&& c.lifeState().canMove()) {
+                
+                if(!board1.blockAt(c.position().containingCell().neighbor(speedChangeEvents.get(id).get())).canHostPlayer()){
+                    isBlocked=true;
+                }
+                
+                if(bombedCells1.contains(c.position().containingCell())){
+                    if(c.position().distanceToCentral()==6){
+                        if(c.position().neighbor(speedChangeEvents.get(id).get()).distanceToCentral()==5){
+                            isBlocked=true;
+                        }
+                    }
+                }
+                
+                if(speedChangeEvents.get(id).get().isParallelTo(c.direction())){
+                    
+                    dirPosSeq=DirectedPosition.moving(new DirectedPosition(c.position(), speedChangeEvents.get(id).get()));
+                   
+                }
+                else{
 
+                    dirPosSeq=DirectedPosition.moving(new DirectedPosition(c.position(), c.direction()));
+                    dirPosSeq=takewhileMeth(dirPosSeq, c.direction());
+                    dirPosSeq.concat((DirectedPosition.moving(findFirstMeth(dirPosSeq, speedChangeEvents.get(id).get()))));
+                    
+                }
+                
+                if(!isBlocked){
+                    dirPosSeq=dirPosSeq.tail();
+                }
+                
+            }
+            else if(!speedChangeEvents.get(id).isPresent()&& c.lifeState().canMove()){
+                
+                if(!board1.blockAt(c.position().containingCell().neighbor(speedChangeEvents.get(id).get())).canHostPlayer()){
+                    isBlocked=true;
+                }
+                
+                if(bombedCells1.contains(c.position().containingCell())){
+                    if(c.position().distanceToCentral()==6){
+                        if(c.position().neighbor(speedChangeEvents.get(id).get()).distanceToCentral()==5){
+                            isBlocked=true;
+                        }
+                    }
+                }
+                
+                if(!isBlocked){
+                dirPosSeq=takewhileMeth(dirPosSeq, c.direction()).concat(DirectedPosition.stopped(new DirectedPosition(c.position(), c.direction())));
+                dirPosSeq=dirPosSeq.tail();
+                }
+                else{
+                    dirPosSeq=c.directedPositions();
                 }
             }
-
-            else {
-
+            else{
+                dirPosSeq=c.directedPositions();
             }
-
+            DirPosSeqTemp.put(id, dirPosSeq);
         }
 
-        // Use the new lists !
+
 
         // Player's state
+        
+        Map<PlayerID, Sq<LifeState>> LifeStateSeqTemp=new HashMap<>();
+        
         for (Player c : players0) {
-            if (blastedCells1.contains(c.position().containingCell())) {
-
+            if (blastedCells1.contains(c.position().containingCell())&&c.lifeState().state().equals(State.VULNERABLE)) {
+                LifeStateSeqTemp.put(c.id(), c.statesForNextLife());
             }
         }
+        
+        for (Player p : players0 ){
+            modifyPlayers.add(new Player(p.id(), LifeStateSeqTemp.get(p.id()), DirPosSeqTemp.get(p.id()), p.maxBombs(), p.bombRange()));
+
+        }
+
         // Bonuses ...
-        for (Player c : players0) {
+        for (Player c : modifyPlayers) {
 
             playerBonuses.get(c.id()).applyTo(c);
         }
+        
+        
+        
+        return modifyPlayers;
     }
-
+    
+    /**
+     * @param j
+     * @param d
+     * @return
+     */
+    static public Sq<DirectedPosition> takewhileMeth(Sq<DirectedPosition> j, Direction d){
+        return j.takeWhile(u->!(u.position().neighbor(d).isCentral()));
+    }
+    
+    /**
+     * @param j
+     * @param d
+     * @return
+     */
+    static public DirectedPosition findFirstMeth(Sq<DirectedPosition> j, Direction d){
+        return j.findFirst(u->u.position().isCentral()).withDirection(d);
+    }
+    
 }

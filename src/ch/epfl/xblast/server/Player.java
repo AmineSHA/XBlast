@@ -305,7 +305,7 @@ final public class Player {
 		}
 
 		/**
-         * Generate a sequence 
+         * Generate a sequence for stopping
          * @param p
          *          the directed position
          * @return the sequence of DirectedMovement of movement stop 
@@ -315,10 +315,10 @@ final public class Player {
 		}
 
 		/**
-		 * 
+		 * Generate a sequence for moving
 		 * @param p
 		 *        the directed position
-		 * @return the sequence of movement stop
+		 * @return the sequence of DirectedMovement of movement
 		 */
 		public static Sq<DirectedPosition> moving(DirectedPosition p) {
 			return Sq.iterate(p, c -> {
@@ -360,6 +360,8 @@ final public class Player {
 		public DirectedPosition withDirection(Direction newDirection) {
 			return new DirectedPosition(this.position, newDirection);
 		}
+		
+		
 
 	}
 }
