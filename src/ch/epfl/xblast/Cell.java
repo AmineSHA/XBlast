@@ -121,7 +121,7 @@ public final class Cell {
 	}
     /**
      * reorganises Cells in spiral major order
-     * @returns an ArrayList of Cell organized in spiral major order
+     * @return an ArrayList of Cell organized in spiral major order
      */
 	public static ArrayList<Cell> SpiralMajorOrder() {
 		ArrayList<Cell> spiralOrder = new ArrayList<Cell>();

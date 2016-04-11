@@ -305,7 +305,6 @@ final public class GameState {
 
         }
 
-  
         Set<Cell> bombedCells1Set = new HashSet<>();
         Map<Cell, Bomb> bombedCells1Map = bombedCells();
         for (Cell z : bombedCells1Map.keySet()) {
@@ -459,159 +458,138 @@ final public class GameState {
             Board board1, Set<Cell> blastedCells1,
             Map<PlayerID, Optional<Direction>> speedChangeEvents) {
         List<Player> modifyPlayers = new ArrayList<>();
-        Map<PlayerID, Sq<DirectedPosition>> DirPosSeqTemp = new HashMap<>();
+
 
         for (Player c : players0) {
 
             PlayerID id = c.id();
-            
-            
-            Sq<DirectedPosition> dirPosSeq = c.directedPositions();
             boolean isBlocked = false;
 
+            Sq<DirectedPosition> dirPosSeq = c.directedPositions();
+
             if (speedChangeEvents.containsKey(id)) {
-                if (speedChangeEvents.get(id).isPresent()
-                        && c.lifeState().canMove()) {
 
-                    if (!board1
-                            .blockAt(c.position().containingCell()
-                                    .neighbor(speedChangeEvents.get(id).get()))
-                            .canHostPlayer()) {
-                        isBlocked = true;
-                    }
+                isBlocked = isBlockedMeth(board1, c, speedChangeEvents,
+                        bombedCells1);
 
-                    if (bombedCells1.contains(c.position().containingCell())) {
-                        if (c.position().distanceToCentral() == 6) {
-                            if (c.position()
-                                    .neighbor(speedChangeEvents.get(id).get())
-                                    .distanceToCentral() == 5) {
-                                isBlocked = true;
-                            }
-                        }
-                    }
+                if (c.lifeState().canMove() && !isBlocked) {
 
-                    if (speedChangeEvents.get(id).get()
+                    if (!speedChangeEvents.get(id).get()
                             .isParallelTo(c.direction())) {
 
+                        DirectedPosition cent = findFirstMeth(dirPosSeq);
+                        cent = cent
+                                .withDirection(speedChangeEvents.get(id).get());
+
+                        dirPosSeq = takewhileMeth(dirPosSeq)
+                                .concat((DirectedPosition.moving(cent)));
+                        // will go to the cs before changing for relative left
+                        // or right
+                    }
+
+                    else {
                         dirPosSeq = DirectedPosition
                                 .moving(new DirectedPosition(c.position(),
                                         speedChangeEvents.get(id).get()));
-
-                    } else {
-
-                        dirPosSeq = DirectedPosition
-                                .moving(new DirectedPosition(c.position(),
-                                        c.direction()));
-                        DirectedPosition cent=findFirstMeth(
-                                dirPosSeq, c.direction());
-                        cent=cent.withDirection(speedChangeEvents.get(id).get());
-                        
-                        dirPosSeq = takewhileMeth(dirPosSeq, c.direction()).concat((DirectedPosition.moving(cent)));
-                       
-
+                        // goes forward or backwards
                     }
+                    dirPosSeq = dirPosSeq.tail();
 
-                    if (!isBlocked) {
-                        dirPosSeq = dirPosSeq.tail();
-                    }
-                    
+                } else if (c.lifeState().canMove() && isBlocked) {
+                    dirPosSeq = DirectedPosition.moving(new DirectedPosition(
+                            c.position(), speedChangeEvents.get(id).get()));
+                    // prepare for when he isn't blocked anymore
+                }
 
-                } else if (!speedChangeEvents.get(id).isPresent()
-                        && c.lifeState().canMove()) {
+            }
 
-                    if (!board1
-                            .blockAt(c.position().containingCell()
-                                    .neighbor(c.direction())
-                            ).canHostPlayer()) {
-                        isBlocked = true;
-                    }
+            else {
+                // player doesn't make any input
+                // it should still move until the first cs
+                isBlocked = isBlockedMeth(board1, c, speedChangeEvents,
+                        bombedCells1);
+                DirectedPosition cent2 = findFirstMeth(dirPosSeq);
 
-                    if (bombedCells1.contains(c.position().containingCell())) {
-                        if (c.position().distanceToCentral() == 6) {
-                            if (c.position()
-                                    .neighbor(c.direction())
-                                    .distanceToCentral() == 5) {
-                                isBlocked = true;
-                            }
-                        }
-                    }
+                if (c.lifeState().canMove() && !isBlocked) {
 
-                    if (!isBlocked) {
-                        dirPosSeq = DirectedPosition
-                                .moving(new DirectedPosition(c.position(),
-                                        c.direction()));
-                        DirectedPosition cent1=findFirstMeth(
-                                dirPosSeq, c.direction());
-                        
-                        
-                        dirPosSeq = takewhileMeth(dirPosSeq, c.direction()).concat((DirectedPosition.stopped(cent1)));
-                       
-                        
-                        
-                        dirPosSeq = dirPosSeq.tail();
-                    } else {
-                        dirPosSeq = c.directedPositions();
-                    }
-                } else {
-                    dirPosSeq = c.directedPositions();
+                    dirPosSeq = takewhileMeth(dirPosSeq)
+                            .concat(DirectedPosition.stopped(cent2));
+
+                    dirPosSeq = dirPosSeq.tail();
+                }
+
+                else if (c.lifeState().canMove() && isBlocked) {
+
+                    dirPosSeq = takewhileMeth(dirPosSeq)
+                            .concat(DirectedPosition.stopped(cent2));
+
+                }
+
+                
+
+            }
+
+            //Player life and state
+           Sq<LifeState> LifStatSeqTemp = c.lifeStates();
+           if (blastedCells1.contains(c.position().containingCell())
+                   && c.lifeState().state().equals(State.VULNERABLE)) {
+               LifStatSeqTemp=c.statesForNextLife();
+           }
+            
+           //Bonuses
+            if(playerBonuses.containsKey(id))
+                playerBonuses.get(id).applyTo(c);
+            
+            modifyPlayers.add(new Player(id, LifStatSeqTemp, dirPosSeq, c.maxBombs(), c.bombRange()));
+            
+        }
+
+        return modifyPlayers;
+    }
+
+    static private boolean isBlockedMeth(Board board1, Player c,
+            Map<PlayerID, Optional<Direction>> speedChangeEvents,
+            Set<Cell> bombedCells1) {
+        boolean isBlocked = false;
+        if (board1
+                .blockAt(c.position().containingCell()
+                        .neighbor(speedChangeEvents.get(c.id()).get()))
+                .castsShadow()) {
+            isBlocked = true;
+        }
+
+        if (bombedCells1.contains(c.position().containingCell())) {
+            if (c.position().distanceToCentral() == 6) {
+                if (c.position().neighbor(speedChangeEvents.get(c.id()).get())
+                        .distanceToCentral() == 5) {
+                    isBlocked = true;
                 }
             }
-            else{
-                dirPosSeq = c.directedPositions();
-            }
-            DirPosSeqTemp.put(id, dirPosSeq);
         }
-
-        // Player's state
-
-        Map<PlayerID, Sq<LifeState>> LifeStateSeqTemp = new HashMap<>();
-
-        for (Player c : players0) {
-            if (blastedCells1.contains(c.position().containingCell())
-                    && c.lifeState().state().equals(State.VULNERABLE)) {
-                LifeStateSeqTemp.put(c.id(), c.statesForNextLife());
-            }
-            else{
-                LifeStateSeqTemp.put(c.id(), c.lifeStates());
-            }
-        }
-
-        for (Player p : players0) {
-            modifyPlayers.add(new Player(p.id(), LifeStateSeqTemp.get(p.id()),
-                    DirPosSeqTemp.get(p.id()), p.maxBombs(), p.bombRange()));
-
-        }
-
-        // Bonuses ...
-        for (Player c : modifyPlayers) {
-             if(playerBonuses.containsKey(c.id()))
-            playerBonuses.get(c.id()).applyTo(c);
-        }
-        
-        return modifyPlayers;
+        return isBlocked;
     }
 
     /**
      * applies takeWhile
+     * 
      * @param j
      * @param d
-     * @return Sq<DirectedPosition> 
+     * @return Sq<DirectedPosition>
      */
-    static private Sq<DirectedPosition> takewhileMeth(Sq<DirectedPosition> j,
-            Direction d) {
+    static private Sq<DirectedPosition> takewhileMeth(Sq<DirectedPosition> j) {
         return j.takeWhile(u -> !(u.position().isCentral()));
     }
 
     /**
      * applies findFirst
+     * 
      * @param j
      * @param d
      * @return DirectedPosition
      */
-    static private DirectedPosition findFirstMeth(Sq<DirectedPosition> j,
-            Direction d) {
-        
-        return j.findFirst(u -> u.position().isCentral()).withDirection(d);
+    static private DirectedPosition findFirstMeth(Sq<DirectedPosition> j) {
+
+        return j.findFirst(u -> u.position().isCentral());
     }
 
 }
