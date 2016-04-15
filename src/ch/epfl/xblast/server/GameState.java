@@ -1,11 +1,13 @@
 package ch.epfl.xblast.server;
 
 import ch.epfl.cs108.*;
+import ch.epfl.xblast.server.*;
 import ch.epfl.xblast.*;
 import ch.epfl.xblast.server.Player.DirectedPosition;
 import ch.epfl.xblast.server.Player.LifeState;
 import ch.epfl.xblast.server.Player.LifeState.State;
 import java.util.*;
+import java.io.IOException;
 
 /**
  * 
@@ -274,7 +276,6 @@ final public class GameState {
         Set<Cell> bombedCells1Set = new HashSet<>();
         for (Bomb b : bombs1)
             bombedCells1Set.add(b.position());
-        
         
 
         List<Player> Player1 = nextPlayers(this.players, playerBonuses1,

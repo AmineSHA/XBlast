@@ -1,6 +1,8 @@
 package ch.epfl.xblast;
 
-
+//TODO ici etait import arraylist
+import java.util.List;
+import javax.swing.event.CellEditorListener;
 
 /**
  * 
