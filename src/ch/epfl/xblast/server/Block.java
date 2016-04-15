@@ -1,5 +1,7 @@
 package ch.epfl.xblast.server;
 
+import java.util.NoSuchElementException;
+
 public enum Block {
 
     /**
@@ -76,6 +78,8 @@ public enum Block {
      * @return a bonus or nothing
      */
     public Bonus associatedBonus() {
+        if(this.castsShadow()|| this.isFree())
+            throw new NoSuchElementException();
         return this.maybeAssociatedBonus;
     }
 

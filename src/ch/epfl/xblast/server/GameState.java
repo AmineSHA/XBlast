@@ -8,6 +8,7 @@ import ch.epfl.xblast.server.Player.DirectedPosition;
 import ch.epfl.xblast.server.Player.LifeState;
 import ch.epfl.xblast.server.Player.LifeState.State;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -43,7 +44,8 @@ final public class GameState {
      * @return the corresponding sequence given the randomly generated number.
      */
     static private Sq<Block> generateRandomSequence() {
-        switch (RANDOM.nextInt()) {
+        
+        switch (RANDOM.nextInt(3)) {
         case 0:
             return Sq.constant(Block.BONUS_BOMB);
         case 1:
@@ -75,12 +77,18 @@ final public class GameState {
             List<Bomb> bombs, List<Sq<Sq<Cell>>> explosions,
             List<Sq<Cell>> blasts) {
 
+        if (players.size() != 4)
+            throw new IllegalArgumentException();
         this.ticks = ArgumentChecker.requireNonNegative(ticks);
         this.board = Objects.requireNonNull(board);
-        this.players = Objects.requireNonNull(players);
-        this.bombs = Objects.requireNonNull(bombs);
-        this.explosions = Objects.requireNonNull(explosions);
-        this.blasts = Objects.requireNonNull(blasts);
+        this.players = Collections.unmodifiableList(
+                new ArrayList<>(Objects.requireNonNull(players)));
+        this.bombs = Collections.unmodifiableList(
+                new ArrayList<>(Objects.requireNonNull(bombs)));
+        this.explosions = Collections.unmodifiableList(
+                new ArrayList<>(Objects.requireNonNull(explosions)));
+        this.blasts = Collections.unmodifiableList(
+                new ArrayList<>(Objects.requireNonNull(blasts)));
     }
 
     /**
@@ -111,7 +119,7 @@ final public class GameState {
      * @return true if the game's over, false if not
      */
     public boolean isGameOver() {
-        return (alivePlayers().isEmpty() || ticks >= Ticks.TOTAL_TICKS);
+        return (alivePlayers().size() <= 1 || ticks >= Ticks.TOTAL_TICKS);
 
     }
 
@@ -155,7 +163,7 @@ final public class GameState {
      * @return the remaining time
      */
     public double remainingTime() {
-        return (Ticks.TOTAL_TICKS - ticks);
+        return (Ticks.TOTAL_TICKS - ticks) / Ticks.TICKS_PER_SECOND;
     }
 
     /**
@@ -193,14 +201,12 @@ final public class GameState {
 
         List<Sq<Cell>> blasts1 = new ArrayList<>();
         for (Sq<Cell> r : blasts0) {
-            if (!r.tail().isEmpty() && board0.blockAt(r.head()).isFree()) {
-
+            if (!r.tail().isEmpty() && board0.blockAt(r.head()).isFree())
                 blasts1.add(r.tail());
-
-            }
         }
         for (Sq<Sq<Cell>> f : explosions0) {
-            blasts1.add(f.head());
+            if (!f.head().isEmpty() && board0.blockAt(f.head().head()).isFree())
+                blasts1.add(f.head());
         }
         return blasts1;
     }
@@ -222,7 +228,7 @@ final public class GameState {
     /**
      * associate a blast sequence and a Cell (which is returned)
      * 
-     * @return the map of the cells and the attached Blast set
+     * @return the set of the cells and the attached Blast set
      */
     public Set<Cell> blastedCells() {
         Set<Cell> blasted = new HashSet<Cell>();
@@ -246,9 +252,9 @@ final public class GameState {
             List<Sq<Sq<Cell>>> explosions0) {
         List<Sq<Sq<Cell>>> explosions1 = new ArrayList<>();
 
-        for (Sq<Sq<Cell>> b : explosions0) {
-            explosions1.add(b.tail());
-        }
+        for (Sq<Sq<Cell>> e : explosions0) 
+            if (!e.tail().isEmpty())
+                explosions1.add(e.tail());
 
         return explosions1;
     }
@@ -268,8 +274,13 @@ final public class GameState {
         List<Sq<Cell>> blasts1 = GameState.nextBlasts(this.blasts, this.board,
                 this.explosions);
 
-        Map<PlayerID, Bonus> playerBonuses1 = new HashMap<>();// this is used
-                                                              // for nextplayer
+        Set<Cell> BlastedCells1 = new HashSet<>();
+        for(Sq<Cell>c : blasts1)
+            BlastedCells1.add(c.head());
+        Map<PlayerID, Bonus> playerBonuses1 = new HashMap<>();/*
+                                                               * this is used
+                                                               * for nextplayer
+                                                               */
 
         Set<Cell> consumedBonuses = new HashSet<>();
         for (Player p : players) {
@@ -282,25 +293,25 @@ final public class GameState {
             }
         }
 
-        Board board1 = nextBoard(this.board, consumedBonuses, blastedCells());
+        Board board1 = nextBoard(this.board, consumedBonuses, BlastedCells1);
 
-        List<Sq<Sq<Cell>>> explosions1 = GameState
-                .nextExplosions(this.explosions);
+        List<Sq<Sq<Cell>>> explosions1 = nextExplosions(this.explosions);
 
-        List<Bomb> bombs1 = GameState.newlyDroppedBombs(this.players,
-                bombDropEvents, this.bombs);
+        List<Bomb> bombs1 = newlyDroppedBombs(this.players, bombDropEvents,
+                this.bombs);
 
         for (Bomb b : this.bombs) {
-            if (!(b.fuseLength() == 0)) {// TODO si sa marche pas c'est ici le
-                                         // prob (== =<)
-                bombs1.add(b);
+
+            if ((b.fuseLength() == 1)
+                    || (blastedCells().contains(b.position()))) {
+                explosions1.addAll(b.explosion());
+
             }
 
-            else if (!blastedCells().contains(b)) {
-                bombs1.add(b);
+            else {
+                bombs1.add(new Bomb(b.ownerId(), b.position(),
+                        b.fuseLength() - 1, b.range()));
 
-            } else {
-                explosions1.addAll(b.explosion());
             }
 
         }
@@ -334,22 +345,30 @@ final public class GameState {
             Set<Cell> blastedCells1) {
         List<Cell> cellsRowMajorOrder = Cell.ROW_MAJOR_ORDER;
         List<Sq<Block>> boardArgument = new ArrayList<>();
+        
+        
         for (Cell c : cellsRowMajorOrder) {
             if (consumedBonuses.contains(c)) {
                 boardArgument.add(Sq.constant(Block.FREE));
-            } else if (blastedCells1.contains(c)
+            }
+
+            else if (blastedCells1.contains(c)
                     && board0.blockAt(c) == Block.DESTRUCTIBLE_WALL) {
                 boardArgument.add(Sq
                         .repeat(Ticks.WALL_CRUMBLING_TICKS,
                                 Block.CRUMBLING_WALL)
                         .concat(generateRandomSequence()));
-            } else if (board0.blockAt(c).name().contains("BONUS")
+            } 
+            
+            else if (board0.blockAt(c).name().contains("BONUS")
                     && blastedCells1.contains(c)) {
                 boardArgument.add(
                         board0.blocksAt(c).limit(Ticks.BONUS_DISAPPEARING_TICKS)
                                 .concat(Sq.constant(Block.FREE)));
-            } else {
-                boardArgument.add(board0.blocksAt(c));
+            } 
+            
+            else {
+                boardArgument.add(board0.blocksAt(c).tail());
 
             }
         }
@@ -430,7 +449,7 @@ final public class GameState {
         List<Bomb> bombs1 = new ArrayList<>();
         for (Player p : endBombermen) {
             bombs1.add(new Bomb(p.id(), p.position().containingCell(),
-                    Ticks.BOMB_FUSE_TICKS, p.bombRange()));
+                    Ticks.BOMB_FUSE_TICKS-1, p.bombRange()));
         }
 
         return bombs1;
@@ -462,73 +481,58 @@ final public class GameState {
         for (Player c : players0) {
 
             PlayerID id = c.id();
-            boolean isBlocked = false;
-
+            
             Sq<DirectedPosition> dirPosSeq = c.directedPositions();
-
+            DirectedPosition cent = findFirstMeth(dirPosSeq);
+            
             if (speedChangeEvents.containsKey(id)) {
 
                 if (speedChangeEvents.get(id).isPresent()) {
-                    isBlocked = isBlockedMeth(board1, c,
-                            speedChangeEvents.get(id).get(), bombedCells1);
+                    
+                    if (!speedChangeEvents.get(id).get()
+                            .isParallelTo(c.direction())) {
 
-                    if (c.lifeState().canMove() && !isBlocked) {
+                        cent = cent.withDirection(
+                                speedChangeEvents.get(id).get());
 
-                        if (!speedChangeEvents.get(id).get()
-                                .isParallelTo(c.direction())) {
-
-                            DirectedPosition cent = findFirstMeth(dirPosSeq);
-                            cent = cent.withDirection(
-                                    speedChangeEvents.get(id).get());
-
-                            dirPosSeq = takewhileMeth(dirPosSeq)
-                                    .concat((DirectedPosition.moving(cent)));
-                            // will go to the cs before changing for relative
-                            // left
-                            // or right
-                        }
-
-                        else {
-                            dirPosSeq = DirectedPosition
-                                    .moving(new DirectedPosition(c.position(),
-                                            speedChangeEvents.get(id).get()));
-                            // goes forward or backwards
-                        }
-                        dirPosSeq = dirPosSeq.tail();
-
-                    } else if (c.lifeState().canMove() && isBlocked) {
+                        dirPosSeq = takewhileMeth(dirPosSeq)
+                                .concat((DirectedPosition.moving(cent)));
+                        /*
+                         * will go to the cs before changing for relative
+                         * left or right
+                         */
+                    }
+                    
+                    else{
                         dirPosSeq = DirectedPosition
                                 .moving(new DirectedPosition(c.position(),
                                         speedChangeEvents.get(id).get()));
-                        // prepare for when he isn't blocked anymore
+                        // goes forward or backwards
+                        
                     }
+                        
+                    
                 }
+            }
+            else{
+                /*
+                 * player doesn't make any input it should still move until the
+                 * first cs
+                 */
+                
+                
+                dirPosSeq = takewhileMeth(dirPosSeq)
+                        .concat(DirectedPosition.stopped(cent));
+
+                dirPosSeq = dirPosSeq.tail();
 
             }
+            
+            if(!isBlockedMeth(board1, c, dirPosSeq.head().direction(), bombedCells1))
+                dirPosSeq=dirPosSeq.tail();
+                
+          
 
-            else {
-                // player doesn't make any input
-                // it should still move until the first cs
-                isBlocked = isBlockedMeth(board1, c, c.direction(),
-                        bombedCells1);
-                DirectedPosition cent2 = findFirstMeth(dirPosSeq);
-
-                if (c.lifeState().canMove() && !isBlocked) {
-
-                    dirPosSeq = takewhileMeth(dirPosSeq)
-                            .concat(DirectedPosition.stopped(cent2));
-
-                    dirPosSeq = dirPosSeq.tail();
-                }
-
-                else if (c.lifeState().canMove() && isBlocked) {
-
-                    dirPosSeq = takewhileMeth(dirPosSeq)
-                            .concat(DirectedPosition.stopped(cent2));
-
-                }
-
-            }
 
             // Player life and state
             Sq<LifeState> LifStatSeqTemp = c.lifeStates();
@@ -538,12 +542,21 @@ final public class GameState {
             }
 
             // Bonuses
-            if (playerBonuses.containsKey(id))
-                playerBonuses.get(id).applyTo(c);
-
+            
+            if (playerBonuses.containsKey(id)){
+                
+                Player tempPlayer;
+                tempPlayer=playerBonuses.get(id).applyTo(c);
+                
             modifyPlayers.add(new Player(id, LifStatSeqTemp, dirPosSeq,
-                    c.maxBombs(), c.bombRange()));
+                    tempPlayer.maxBombs(), tempPlayer.bombRange()));
+            }
 
+            else{
+                modifyPlayers.add(new Player(id, LifStatSeqTemp, dirPosSeq,
+                        c.maxBombs(), c.bombRange()));
+            }
+            
         }
 
         return modifyPlayers;
@@ -553,13 +566,13 @@ final public class GameState {
             Set<Cell> bombedCells1) {
         boolean isBlocked = false;
         if (board1.blockAt(c.position().containingCell().neighbor(dir))
-                .castsShadow()&& c.position().isCentral()) {
+                .castsShadow() && c.position().isCentral()) {
             isBlocked = true;
         }
 
         if (bombedCells1.contains(c.position().containingCell())) {
             if (c.position().distanceToCentral() == 6) {
-                if (c.position().neighbor(dir).distanceToCentral() == 5) {
+                if (c.position().neighbor(dir).distanceToCentral() <= 6) {
                     isBlocked = true;
                 }
             }
@@ -590,4 +603,9 @@ final public class GameState {
         return j.findFirst(u -> u.position().isCentral());
     }
 
+    @Override
+    public String toString(){
+        return ticks+" "+players+" "+board;
+        
+    }
 }

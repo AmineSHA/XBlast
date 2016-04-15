@@ -6,6 +6,7 @@ import ch.epfl.cs108.Sq;
 import ch.epfl.xblast.PlayerID;
 import ch.epfl.xblast.Direction;
 import ch.epfl.xblast.SubCell;
+import ch.epfl.xblast.server.Player.LifeState.State;
 import ch.epfl.xblast.Cell;
 import ch.epfl.xblast.ArgumentChecker;
 /**
@@ -66,13 +67,22 @@ final public class Player {
      */
 	public Player(PlayerID id, int lives, Cell position, int maxBombs,
 			int bombRange) {
-		this(id, Sq.repeat(Ticks.PLAYER_INVULNERABLE_TICKS,
-				new LifeState(lives, LifeState.State.INVULNERABLE)).concat(
-				Sq.constant(new LifeState(lives, LifeState.State.VULNERABLE))),
+	    
+		this(id, methodForConstructor(lives),
 				Sq.constant(new DirectedPosition(SubCell
 						.centralSubCellOf(position), Direction.S)), maxBombs,
 				bombRange);
 
+	}
+	
+	private static Sq<LifeState> methodForConstructor(int lives){
+	    if(lives==0)
+	        return Sq.constant(new LifeState(lives, State.DEAD));
+	    
+	    return Sq.repeat(Ticks.PLAYER_INVULNERABLE_TICKS,
+                new LifeState(lives, LifeState.State.INVULNERABLE)).concat(
+                Sq.constant(new LifeState(lives, LifeState.State.VULNERABLE)));
+	 
 	}
 
 	/**
@@ -108,7 +118,7 @@ final public class Player {
 		Sq<LifeState> dyingBasisSequence = Sq.repeat(Ticks.PLAYER_DYING_TICKS,
 				new LifeState(lives, LifeState.State.DYING));
 
-		if (!isAlive()) {
+		if (lives()<=1) {
 			return dyingBasisSequence.concat(Sq.constant(new LifeState(0,
 					LifeState.State.DEAD)));
 		} else {
@@ -261,8 +271,8 @@ final public class Player {
          *      State
          */
 		public LifeState(int lives, State state) {
-			this.lives = lives;
-			this.state = state;
+			this.lives = ArgumentChecker.requireNonNegative(lives);
+			this.state = Objects.requireNonNull(state);
 		}
 
 		/**

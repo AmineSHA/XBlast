@@ -14,7 +14,7 @@ import ch.epfl.xblast.Lists;
  */
 
 public final class Board {
-    private List<Sq<Block>> blocks= new ArrayList<>();
+    private final List<Sq<Block>> blocks;
     
 
     /**
@@ -25,7 +25,7 @@ public final class Board {
         if (blocks.size()!=195){
             throw new IllegalArgumentException();
             }
-        this.blocks= blocks;
+        this.blocks= Collections.unmodifiableList(new ArrayList(blocks));
     }
     
     /**

@@ -1,12 +1,14 @@
 package ch.epfl.xblast.server;
 
 import ch.epfl.cs108.Sq;
+import ch.epfl.xblast.ArgumentChecker;
 import ch.epfl.xblast.Cell;
 import ch.epfl.xblast.PlayerID;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import ch.epfl.xblast.Direction;
 /**
@@ -35,14 +37,13 @@ final public class Bomb {
      */
     public Bomb(PlayerID ownerId, Cell position, Sq<Integer> fuseLengths, int range) {
 
-        if (ownerId == null || position == null || fuseLengths == null) {
-            throw new NullPointerException();
-        }
+        if(fuseLengths.isEmpty())
+            throw new IllegalArgumentException();
 
-        this.ownerId = ownerId;
-        this.position = position;
-        this.fuseLengths = fuseLengths;
-        this.range = range;
+        this.ownerId = Objects.requireNonNull(ownerId);
+        this.position = Objects.requireNonNull(position);
+        this.fuseLengths = Objects.requireNonNull(fuseLengths);
+        this.range = ArgumentChecker.requireNonNegative(range);
 
     }
 
@@ -59,7 +60,7 @@ final public class Bomb {
      */
     public Bomb(PlayerID ownerId, Cell position, int fuseLength, int range) {
 
-        this(ownerId, position, Sq.iterate(fuseLength, u -> u - 1).takeWhile(u-> u>=0), range);
+        this(ownerId, position, Sq.iterate(ArgumentChecker.requireNonNegative(fuseLength), u -> u - 1).limit(fuseLength),range);
 
     }
 
@@ -124,7 +125,7 @@ final public class Bomb {
      */
     private Sq<Sq<Cell>> explosionArmTowards(Direction Dir) {
 
-        return Sq.repeat(Ticks.EXPLOSION_TICKS,Sq.iterate(new Cell(position.x(), position.y()),c -> c.neighbor(Dir)));
+        return Sq.repeat(Ticks.EXPLOSION_TICKS,Sq.iterate(new Cell(position.x(), position.y()),c -> c.neighbor(Dir)).limit(range));
 
     }
 
