@@ -46,6 +46,7 @@ public enum Block {
 
     /**
      * checks if it's free
+     * 
      * @return true if it's free
      */
     public boolean isFree() {
@@ -55,6 +56,7 @@ public enum Block {
 
     /**
      * checks if it can host a player
+     * 
      * @return true if it can host player
      */
 
@@ -64,6 +66,7 @@ public enum Block {
 
     /**
      * checks if it can cast shadow
+     * 
      * @return true if it can cast shadows
      */
     public boolean castsShadow() {
@@ -72,6 +75,7 @@ public enum Block {
 
     /**
      * Check's if it is a bonus
+     * 
      * @return true if it's a bonus
      */
     public boolean isBonus() {
@@ -80,11 +84,13 @@ public enum Block {
 
     /**
      * May associate a bonus to this
+     * 
      * @return a bonus or nothing
      */
     public Bonus associatedBonus() {
-        if(this.castsShadow()|| this.isFree())
+        if (this.castsShadow() || this.isFree())
             throw new NoSuchElementException();
+
         return this.maybeAssociatedBonus;
     }
 

@@ -12,7 +12,7 @@ public interface Ticks {
      * the Player dying ticks
      */
     public static int PLAYER_DYING_TICKS = 8;
-    
+
     /**
      * the player invulnerable ticks
      */

@@ -1,9 +1,5 @@
 package ch.epfl.xblast;
 
-//TODO ici etait import arraylist
-import java.util.List;
-import javax.swing.event.CellEditorListener;
-
 /**
  * 
  * @author Amine Chaouachi (260709) / Alban Favre (260025)
@@ -11,7 +7,6 @@ import javax.swing.event.CellEditorListener;
  */
 public final class SubCell {
 
-    
     private final int x;
     private final int y;
     /**
@@ -29,41 +24,44 @@ public final class SubCell {
 
     /**
      * Construct a SubCell with x and y coordinate
+     * 
      * @param x
-     *          the horizontal coordinate
+     *            the horizontal coordinate
      * @param y
-     *          the vertical coordinate
+     *            the vertical coordinate
      */
     public SubCell(int x, int y) {
         this.x = Math.floorMod(x, COLUMNS);
         this.y = Math.floorMod(y, ROWS);
     }
-    
-
 
     /**
      * Gives the central SubCell of a given Cell
+     * 
      * @param cell
-     *              A Cell
-     * @return The central SubCell of a given Cell
-     *          if there is no center in the SubCell, it will return the center nearest SubCell
+     *            A Cell
+     * @return The central SubCell of a given Cell if there is no center in the
+     *         SubCell, it will return the center nearest SubCell
      */
     public static SubCell centralSubCellOf(Cell cell) {
         int gapx = (int) Math.ceil((SIZE) / 2);
         int gapy = (int) Math.ceil((SIZE) / 2);
-        return new SubCell(cell.x() * SIZE + gapx,
-                cell.y() * SIZE + gapy);
+        return new SubCell(cell.x() * SIZE + gapx, cell.y() * SIZE + gapy);
 
     }
+
     /**
      * The x coordinate getter
+     * 
      * @return the horizontal coordinate x
      */
     public int x() {
         return x;
     }
+
     /**
      * The y coordinate getter
+     * 
      * @return the vertical coordinate y
      */
     public int y() {
@@ -71,8 +69,11 @@ public final class SubCell {
     }
 
     /**
-     * Calculate the Manathan distance between this SubCell and the central SubCell
-     * @return the number of SubCell which have to be crossed to reach the central SubCell
+     * Calculate the Manathan distance between this SubCell and the central
+     * SubCell
+     * 
+     * @return the number of SubCell which have to be crossed to reach the
+     *         central SubCell
      */
     public int distanceToCentral() {
         int absoluteX = Math.abs(
@@ -84,7 +85,9 @@ public final class SubCell {
 
     /**
      * Determine if the SubCell is the central SubCell
-     * @return <b>true</b> if the SubCell is the central SubCell, <b>false</b> otherwise.
+     * 
+     * @return <b>true</b> if the SubCell is the central SubCell, <b>false</b>
+     *         otherwise.
      */
     public boolean isCentral() {
         return (this.distanceToCentral() == 0);
@@ -92,10 +95,12 @@ public final class SubCell {
     }
 
     /**
-     * Gives the neighbor SubCell of a given cardinal direction
-     * (due to the torus nature of the grid, a neighbor always exists)
+     * Gives the neighbor SubCell of a given cardinal direction (due to the
+     * torus nature of the grid, a neighbor always exists)
+     * 
      * @param d
-     *          the cardinal direction that determine which neighbor will be returned
+     *            the cardinal direction that determine which neighbor will be
+     *            returned
      * @return the neighbor SubCell that match the given direction
      */
     public SubCell neighbor(Direction d) {
@@ -116,30 +121,31 @@ public final class SubCell {
 
     /**
      * Gives the Cell that contains the SubCell
+     * 
      * @return The Cell containing the SubCell
      */
     public Cell containingCell() {
-        int xvalue=(int) Math.floor((this.x) / SIZE);
-        int yvalue=(int) Math.floor((this.y) / SIZE);
-        return new Cell(xvalue,yvalue);
+        int xvalue = (int) Math.floor((this.x) / SIZE);
+        int yvalue = (int) Math.floor((this.y) / SIZE);
+        return new Cell(xvalue, yvalue);
     }
-    
+
     @Override
     public boolean equals(Object that) {
         return that instanceof SubCell && ((SubCell) that).x() == this.x()
                 && ((SubCell) that).y() == this.y();
     }
-    
+
     @Override
     public String toString() {
 
         return "( " + x + ", " + y + " )";
     }
 
-	@Override
-	public int hashCode() {
-  
-		return (Math.floorMod(this.x, COLUMNS))+COLUMNS*y();
-	}
+    @Override
+    public int hashCode() {
+
+        return (Math.floorMod(this.x, COLUMNS)) + COLUMNS * y();
+    }
 
 }

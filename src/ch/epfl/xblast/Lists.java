@@ -1,10 +1,9 @@
 package ch.epfl.xblast;
 
 import java.util.Collections;
-
 import java.util.List;
 import java.util.ArrayList;
-import ch.epfl.xblast.server.Block;
+
 
 
 /**
@@ -27,10 +26,13 @@ public final class Lists {
     public static <T> List<T> mirrored(List<T> l) {
         if (l.isEmpty())
             throw new IllegalArgumentException();
+
         if (l.size() == 1)
             return l;
+
         List<T> tableToChange = new ArrayList<T>(l);
         List<T> basicTable = new ArrayList<T>(l);
+
         Collections.reverse(tableToChange);
         tableToChange.remove(0);
         basicTable.addAll(tableToChange);
@@ -47,7 +49,9 @@ public final class Lists {
      * @return the list of lists of all possible permutation
      */
     public static <T> List<List<T>> permutations(List<T> l) {
+
         List<List<T>> end = new ArrayList<List<T>>();
+
         switch (l.size()) {
         case 0:
             end.add(Collections.emptyList());
