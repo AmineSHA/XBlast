@@ -61,12 +61,13 @@ public final class GameStatePrinter {
             String st = "";
             Cell c = Cell.ROW_MAJOR_ORDER.get(i);
             Block b = board.blockAt(c);
-            for (Player p : ps)
-                if (p.position().containingCell().rowMajorIndex() == i && p.isAlive()) {
-                    st = stringForPlayer(p);
-                }
             if (s.bombedCells().containsKey(c) && st == "")
                 st = stringForBomb(s.bombedCells().get(c));
+            for (Player p : ps)
+                if (p.position().containingCell().rowMajorIndex() == i && p.isAlive()&& st == "") {
+                    st = stringForPlayer(p);
+                }
+            
             if (s.blastedCells().contains(c) && st == "" && b.canHostPlayer())
                 st = BlackTXT + GreenBG + "**" + Default;
             if (st == "")

@@ -2,13 +2,9 @@ package ch.epfl.xblast.server;
 
 import ch.epfl.cs108.*;
 import ch.epfl.xblast.*;
-
-import ch.epfl.xblast.server.*;
 import ch.epfl.xblast.server.Player.DirectedPosition;
 import ch.epfl.xblast.server.Player.LifeState;
 import ch.epfl.xblast.server.Player.LifeState.State;
-
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -29,6 +25,7 @@ final public class GameState {
     private final List<Bomb> bombs;
     private final List<Sq<Sq<Cell>>> explosions;
     private final List<Sq<Cell>> blasts;
+    private static final int bombContact=6;
     private static final Random RANDOM = new Random(2016);
     /**
      * the list of all possible permutation of PlayerIDs
@@ -44,7 +41,7 @@ final public class GameState {
      * @return the corresponding sequence given the randomly generated number.
      */
     static private Sq<Block> generateRandomSequence() {
-        
+
         switch (RANDOM.nextInt(3)) {
         case 0:
             return Sq.constant(Block.BONUS_BOMB);
@@ -183,33 +180,7 @@ final public class GameState {
 
     }
 
-    /**
-     * Create all the blasts needed for the next tick Side Note : This method
-     * has been done following the guidelines mentioned in the project. No other
-     * techniques were used.
-     * 
-     * @param blasts0
-     *            The current blasts
-     * @param board0
-     *            the current board
-     * @param explosions0
-     *            the current explosion
-     * @return the blasts of the next Tick.
-     */
-    public static List<Sq<Cell>> nextBlasts(List<Sq<Cell>> blasts0,
-            Board board0, List<Sq<Sq<Cell>>> explosions0) {
-
-        List<Sq<Cell>> blasts1 = new ArrayList<>();
-        for (Sq<Cell> r : blasts0) {
-            if (!r.tail().isEmpty() && board0.blockAt(r.head()).isFree())
-                blasts1.add(r.tail());
-        }
-        for (Sq<Sq<Cell>> f : explosions0) {
-            if (!f.head().isEmpty() && board0.blockAt(f.head().head()).isFree())
-                blasts1.add(f.head());
-        }
-        return blasts1;
-    }
+    
 
     /**
      * associate a bomb and a Cell (which is returned)
@@ -241,23 +212,7 @@ final public class GameState {
         return blasted;
     }
 
-    /**
-     * Create all the explosions needed for the next tick
-     * 
-     * @param explosions0
-     *            All explosions of the current tick
-     * @return the explosions for the next tick
-     */
-    private static List<Sq<Sq<Cell>>> nextExplosions(
-            List<Sq<Sq<Cell>>> explosions0) {
-        List<Sq<Sq<Cell>>> explosions1 = new ArrayList<>();
 
-        for (Sq<Sq<Cell>> e : explosions0) 
-            if (!e.tail().isEmpty())
-                explosions1.add(e.tail());
-
-        return explosions1;
-    }
 
     /**
      * Create the next tick GameState
@@ -275,7 +230,7 @@ final public class GameState {
                 this.explosions);
 
         Set<Cell> BlastedCells1 = new HashSet<>();
-        for(Sq<Cell>c : blasts1)
+        for (Sq<Cell> c : blasts1)
             BlastedCells1.add(c.head());
         Map<PlayerID, Bonus> playerBonuses1 = new HashMap<>();/*
                                                                * this is used
@@ -302,7 +257,7 @@ final public class GameState {
 
         for (Bomb b : this.bombs) {
 
-            if ((b.fuseLength() == 1)
+            if ((b.fuseLengths().tail().isEmpty())
                     || (blastedCells().contains(b.position()))) {
                 explosions1.addAll(b.explosion());
 
@@ -310,24 +265,70 @@ final public class GameState {
 
             else {
                 bombs1.add(new Bomb(b.ownerId(), b.position(),
-                        b.fuseLength() - 1, b.range()));
+                        b.fuseLengths().tail().head(), b.range()));
 
             }
 
         }
 
         Set<Cell> bombedCells1Set = new HashSet<>();
-        Map<Cell, Bomb> bombedCells1Map = bombedCells();
-        for (Cell z : bombedCells1Map.keySet()) {
-            bombedCells1Set.add(z);
-        }
+        for (Bomb b : bombs1)
+            bombedCells1Set.add(b.position());
+        
+        
 
         List<Player> Player1 = nextPlayers(this.players, playerBonuses1,
-                bombedCells1Set, board1, blastedCells(), speedChangeEvents);
+                bombedCells1Set, board1, BlastedCells1, speedChangeEvents);
 
         return new GameState(this.ticks + 1, board1, Player1, bombs1,
                 explosions1, blasts1);
 
+    }
+    
+    /**
+     * Create all the blasts needed for the next tick Side Note : This method
+     * has been done following the guidelines mentioned in the project. No other
+     * techniques were used.
+     * 
+     * @param blasts0
+     *            The current blasts
+     * @param board0
+     *            the current board
+     * @param explosions0
+     *            the current explosion
+     * @return the blasts of the next Tick.
+     */
+    public static List<Sq<Cell>> nextBlasts(List<Sq<Cell>> blasts0,
+            Board board0, List<Sq<Sq<Cell>>> explosions0) {
+
+        List<Sq<Cell>> blasts1 = new ArrayList<>();
+        for (Sq<Cell> r : blasts0) {
+            if (!r.tail().isEmpty() && board0.blockAt(r.head()).isFree())
+                blasts1.add(r.tail());
+        }
+        for (Sq<Sq<Cell>> f : explosions0) {
+            if (!f.head().isEmpty() && board0.blockAt(f.head().head()).isFree())
+                blasts1.add(f.head());
+        }
+        return blasts1;
+    }
+    
+    /**
+     * Create all the explosions needed for the next tick
+     * 
+     * @param explosions0
+     *            All explosions of the current tick
+     * @return the explosions for the next tick
+     */
+    private static List<Sq<Sq<Cell>>> nextExplosions(
+            List<Sq<Sq<Cell>>> explosions0) {
+        List<Sq<Sq<Cell>>> explosions1 = new ArrayList<>();
+
+        for (Sq<Sq<Cell>> e : explosions0)
+            if (!e.tail().isEmpty())
+                explosions1.add(e.tail());
+
+        return explosions1;
     }
 
     /**
@@ -345,8 +346,7 @@ final public class GameState {
             Set<Cell> blastedCells1) {
         List<Cell> cellsRowMajorOrder = Cell.ROW_MAJOR_ORDER;
         List<Sq<Block>> boardArgument = new ArrayList<>();
-        
-        
+
         for (Cell c : cellsRowMajorOrder) {
             if (consumedBonuses.contains(c)) {
                 boardArgument.add(Sq.constant(Block.FREE));
@@ -358,15 +358,15 @@ final public class GameState {
                         .repeat(Ticks.WALL_CRUMBLING_TICKS,
                                 Block.CRUMBLING_WALL)
                         .concat(generateRandomSequence()));
-            } 
-            
+            }
+
             else if (board0.blockAt(c).name().contains("BONUS")
                     && blastedCells1.contains(c)) {
                 boardArgument.add(
                         board0.blocksAt(c).limit(Ticks.BONUS_DISAPPEARING_TICKS)
                                 .concat(Sq.constant(Block.FREE)));
-            } 
-            
+            }
+
             else {
                 boardArgument.add(board0.blocksAt(c).tail());
 
@@ -377,6 +377,110 @@ final public class GameState {
         return board1;
     }
 
+
+
+    /**
+     * Create the players for the next tick
+     * 
+     * @param players0
+     *            current players
+     * @param playerBonuses
+     *            set of player and their bonuses
+     * @param bombedCells1
+     *            the cell that will be bombed next tick
+     * @param board1
+     *            the board of the next tick
+     * @param blastedCells1
+     *            the cells that will be blasted next tick
+     * @param speedChangeEvents
+     *            Player's direction change
+     * @return the list of players of the next tick
+     */
+    private static List<Player> nextPlayers(List<Player> players0,
+            Map<PlayerID, Bonus> playerBonuses, Set<Cell> bombedCells1,
+            Board board1, Set<Cell> blastedCells1,
+            Map<PlayerID, Optional<Direction>> speedChangeEvents) {
+        List<Player> modifyPlayers = new ArrayList<>();
+
+        for (Player c : players0) {
+
+            
+            PlayerID id = c.id();
+
+            Sq<DirectedPosition> dirPosSeq = c.directedPositions();
+            DirectedPosition cent = findFirstMeth(dirPosSeq);
+
+            if (speedChangeEvents.containsKey(id)) {
+
+                if (speedChangeEvents.get(id).isPresent()) {
+
+                   
+                    if (!speedChangeEvents.get(id).get()
+                            .isParallelTo(c.direction())) {
+
+                        cent = cent
+                                .withDirection(speedChangeEvents.get(id).get());
+
+                        dirPosSeq = takewhileMeth(dirPosSeq)
+                                .concat((DirectedPosition.moving(cent)));
+                        /*
+                         * will go to the cs before changing for relative left
+                         * or right
+                         */
+                    }
+
+                    else {
+                        dirPosSeq = DirectedPosition
+                                .moving(new DirectedPosition(c.position(),
+                                        speedChangeEvents.get(id).get()));
+                        // goes forward or backwards
+
+                    }
+
+                } else {
+                    /*
+                     * player doesn't make any input it should still move until
+                     * the first cs
+                     */
+
+                    dirPosSeq = takewhileMeth(dirPosSeq)
+                            .concat(DirectedPosition.stopped(cent));
+
+                }
+            }
+            if (!isBlockedMeth(board1, c, dirPosSeq.head().direction(),
+                    bombedCells1) && c.lifeState().canMove())
+                dirPosSeq = dirPosSeq.tail();
+
+            Player d=new Player(id, c.lifeStates(), dirPosSeq, c.maxBombs(), c.bombRange());
+            
+            // Player life and state
+            Sq<LifeState> lifStatSeqTemp = d.lifeStates();
+            if (blastedCells1.contains(d.position().containingCell())
+                    && d.lifeState().state().equals(State.VULNERABLE)) {
+                lifStatSeqTemp = d.statesForNextLife();
+            }
+
+            else{
+                lifStatSeqTemp=lifStatSeqTemp.tail();
+            }
+            
+            d=new Player(id, lifStatSeqTemp, dirPosSeq, c.maxBombs(), c.bombRange());
+            // Bonuses
+
+            if (playerBonuses.containsKey(id)) 
+                d = playerBonuses.get(id).applyTo(c);
+
+
+                modifyPlayers.add(d);
+
+
+        }
+
+        return modifyPlayers;
+    }
+    
+    
     /**
      * the method which will define which bomb can actually be dropped out of
      * all players that request a bomb drop
@@ -449,135 +553,35 @@ final public class GameState {
         List<Bomb> bombs1 = new ArrayList<>();
         for (Player p : endBombermen) {
             bombs1.add(new Bomb(p.id(), p.position().containingCell(),
-                    Ticks.BOMB_FUSE_TICKS-1, p.bombRange()));
+                    Ticks.BOMB_FUSE_TICKS - 1, p.bombRange()));
         }
 
         return bombs1;
     }
-
+    
     /**
-     * Create the players for the next tick
-     * 
-     * @param players0
-     *            current players
-     * @param playerBonuses
-     *            set of player and their bonuses
-     * @param bombedCells1
-     *            the cell that will be bombed next tick
+     * verify if it's blocked
      * @param board1
-     *            the board of the next tick
-     * @param blastedCells1
-     *            the cells that will be blasted next tick
-     * @param speedChangeEvents
-     *            Player's direction change
-     * @return the list of players of the next tick
+     * @param c
+     * @param dir
+     * @param bombedCells1
+     * @return true if blocked by a bomb or a wall
      */
-    private static List<Player> nextPlayers(List<Player> players0,
-            Map<PlayerID, Bonus> playerBonuses, Set<Cell> bombedCells1,
-            Board board1, Set<Cell> blastedCells1,
-            Map<PlayerID, Optional<Direction>> speedChangeEvents) {
-        List<Player> modifyPlayers = new ArrayList<>();
-
-        for (Player c : players0) {
-
-            PlayerID id = c.id();
-            
-            Sq<DirectedPosition> dirPosSeq = c.directedPositions();
-            DirectedPosition cent = findFirstMeth(dirPosSeq);
-            
-            if (speedChangeEvents.containsKey(id)) {
-
-                if (speedChangeEvents.get(id).isPresent()) {
-                    
-                    if (!speedChangeEvents.get(id).get()
-                            .isParallelTo(c.direction())) {
-
-                        cent = cent.withDirection(
-                                speedChangeEvents.get(id).get());
-
-                        dirPosSeq = takewhileMeth(dirPosSeq)
-                                .concat((DirectedPosition.moving(cent)));
-                        /*
-                         * will go to the cs before changing for relative
-                         * left or right
-                         */
-                    }
-                    
-                    else{
-                        dirPosSeq = DirectedPosition
-                                .moving(new DirectedPosition(c.position(),
-                                        speedChangeEvents.get(id).get()));
-                        // goes forward or backwards
-                        
-                    }
-                        
-                    
-                }
-            }
-            else{
-                /*
-                 * player doesn't make any input it should still move until the
-                 * first cs
-                 */
-                
-                
-                dirPosSeq = takewhileMeth(dirPosSeq)
-                        .concat(DirectedPosition.stopped(cent));
-
-                dirPosSeq = dirPosSeq.tail();
-
-            }
-            
-            if(!isBlockedMeth(board1, c, dirPosSeq.head().direction(), bombedCells1))
-                dirPosSeq=dirPosSeq.tail();
-                
-          
-
-
-            // Player life and state
-            Sq<LifeState> LifStatSeqTemp = c.lifeStates();
-            if (blastedCells1.contains(c.position().containingCell())
-                    && c.lifeState().state().equals(State.VULNERABLE)) {
-                LifStatSeqTemp = c.statesForNextLife();
-            }
-
-            // Bonuses
-            
-            if (playerBonuses.containsKey(id)){
-                
-                Player tempPlayer;
-                tempPlayer=playerBonuses.get(id).applyTo(c);
-                
-            modifyPlayers.add(new Player(id, LifStatSeqTemp, dirPosSeq,
-                    tempPlayer.maxBombs(), tempPlayer.bombRange()));
-            }
-
-            else{
-                modifyPlayers.add(new Player(id, LifStatSeqTemp, dirPosSeq,
-                        c.maxBombs(), c.bombRange()));
-            }
-            
-        }
-
-        return modifyPlayers;
-    }
-
     static private boolean isBlockedMeth(Board board1, Player c, Direction dir,
             Set<Cell> bombedCells1) {
-        boolean isBlocked = false;
         if (board1.blockAt(c.position().containingCell().neighbor(dir))
                 .castsShadow() && c.position().isCentral()) {
-            isBlocked = true;
+            return true;
         }
 
         if (bombedCells1.contains(c.position().containingCell())) {
-            if (c.position().distanceToCentral() == 6) {
-                if (c.position().neighbor(dir).distanceToCentral() <= 6) {
-                    isBlocked = true;
+            if (c.position().distanceToCentral() == bombContact) {
+                if (c.position().neighbor(dir).distanceToCentral() <= bombContact) {
+                    return true;
                 }
             }
         }
-        return isBlocked;
+        return false;
     }
 
     /**
@@ -604,8 +608,8 @@ final public class GameState {
     }
 
     @Override
-    public String toString(){
-        return ticks+" "+players+" "+board;
-        
+    public String toString() {
+        return ticks + " " + players + " " + board;
+
     }
 }

@@ -1,7 +1,6 @@
 package ch.epfl.xblast;
 
-import java.util.List;
-import javax.swing.event.CellEditorListener;
+
 
 /**
  * 
@@ -138,7 +137,7 @@ public final class SubCell {
 	@Override
 	public int hashCode() {
   
-		return (Math.floorMod(this.x, this.COLUMNS))+this.COLUMNS*y();
+		return (Math.floorMod(this.x, COLUMNS))+COLUMNS*y();
 	}
 
 }

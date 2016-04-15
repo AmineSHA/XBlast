@@ -25,7 +25,7 @@ public final class Board {
         if (blocks.size()!=195){
             throw new IllegalArgumentException();
             }
-        this.blocks= Collections.unmodifiableList(new ArrayList(blocks));
+        this.blocks= Collections.unmodifiableList(new ArrayList<Sq>(blocks));
     }
     
     /**

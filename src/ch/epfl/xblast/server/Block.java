@@ -2,6 +2,11 @@ package ch.epfl.xblast.server;
 
 import java.util.NoSuchElementException;
 
+/**
+ * 
+ * @author Amine Chaouachi (260709) / Alban Favre (260025)
+ *
+ */
 public enum Block {
 
     /**

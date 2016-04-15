@@ -1,6 +1,7 @@
 package ch.epfl.xblast.server;
 
 import ch.epfl.cs108.Sq;
+
 import ch.epfl.xblast.ArgumentChecker;
 import ch.epfl.xblast.Cell;
 import ch.epfl.xblast.PlayerID;
