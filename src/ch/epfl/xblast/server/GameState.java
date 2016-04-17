@@ -229,16 +229,18 @@ final public class GameState {
          * for nextplayer
          */
 
+        
         Set<Cell> consumedBonuses = new HashSet<>();
         for (Player p : players) {
             SubCell sub = p.position();
             if (sub.isCentral()
-                    && board.blockAt(sub.containingCell()).isBonus())
+                    && board.blockAt(sub.containingCell()).isBonus()) {
                 consumedBonuses.add(sub.containingCell());
-            playerBonuses1.put(p.id(),
-                    board.blockAt(sub.containingCell()).associatedBonus());
-
+                playerBonuses1.put(p.id(),
+                        board.blockAt(sub.containingCell()).associatedBonus());
+            }
         }
+        
 
         Board board1 = nextBoard(this.board, consumedBonuses, BlastedCells1);
 
