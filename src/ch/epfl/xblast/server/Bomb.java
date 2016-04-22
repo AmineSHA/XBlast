@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 import ch.epfl.xblast.Direction;
-//loltest
+
 /**
  * 
  * @author Amine Chaouachi (260709) / Alban Favre (260025)
