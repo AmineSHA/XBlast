@@ -78,7 +78,7 @@ public final class PlayerPainter {
             }
             
             //if the character is invulnerable and the tick is odd, the character sprite will be replaced by the white character
-            if(player.lifeState().state().equals(State.INVULNERABLE)&&tick%2==1){
+            if(player.lifeState().state().equals(State.INVULNERABLE)&&tick%2!=0){
                 tempValue=(tempValue%PLAYER_MULTIPLIER)+PLAYER_WHITE;
             }
             
