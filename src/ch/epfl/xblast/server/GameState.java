@@ -286,7 +286,7 @@ final public class GameState {
      *            the current explosion
      * @return the blasts of the next Tick.
      */
-    public static List<Sq<Cell>> nextBlasts(List<Sq<Cell>> blasts0,
+    private static List<Sq<Cell>> nextBlasts(List<Sq<Cell>> blasts0,
             Board board0, List<Sq<Sq<Cell>>> explosions0) {
 
         List<Sq<Cell>> blasts1 = new ArrayList<>();
@@ -468,7 +468,7 @@ final public class GameState {
      *            all current bombs on the board
      * @return the bombs that can be dropped
      */
-    public static List<Bomb> newlyDroppedBombs(List<Player> players0,
+    private static List<Bomb> newlyDroppedBombs(List<Player> players0,
             Set<PlayerID> bombDropEvents, List<Bomb> bombs0) {
         List<Player> bombermen = new ArrayList<>();
 
