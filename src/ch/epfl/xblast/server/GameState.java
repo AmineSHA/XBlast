@@ -193,9 +193,9 @@ final public class GameState {
     }
 
     /**
-     * associate a blast sequence and a Cell (which is returned)
+     * create a set of all the cells that are being blasted
      * 
-     * @return the set of the cells and the attached Blast set
+     * @return the set of the cells that are being blasted
      */
     public Set<Cell> blastedCells() {
         Set<Cell> blasted = new HashSet<Cell>();
