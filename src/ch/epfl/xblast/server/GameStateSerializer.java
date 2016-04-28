@@ -5,6 +5,7 @@ import java.util.List;
 
 import ch.epfl.xblast.Cell;
 import ch.epfl.xblast.Direction;
+import ch.epfl.xblast.RunLengthEncoder;
 import ch.epfl.xblast.server.graphics.BoardPainter;
 import ch.epfl.xblast.server.graphics.ExplosionPainter;
 import ch.epfl.xblast.server.graphics.PlayerPainter;
@@ -21,27 +22,44 @@ public final class GameStateSerializer {
     
     private GameStateSerializer() {}
     
+    /**
+     * Create the informations that will be send to clients
+     * @param bp
+     *          A boardPainter
+     * @param gs
+     *          the game state that will be sent
+     * @return a byte list of the game state with the board painter applied and compressed
+     */
     public static List<Byte>serialize(BoardPainter bp, GameState gs){
-        LinkedList<Byte> ByteList = new LinkedList<>();
+        List<Byte> ByteList = new LinkedList<>();
+        List<Byte> temp = new LinkedList<>();
         
         for (Cell c : Cell.SPIRAL_ORDER) 
-        ByteList.add(bp.byteForCell(gs.board(), c));
+        temp.add(bp.byteForCell(gs.board(), c));
+        
+        ByteList.add((byte)temp.size());
+        ByteList.addAll(RunLengthEncoder.encode(temp));
+        temp.clear();
         
         for (Cell c : Cell.ROW_MAJOR_ORDER) {
             if(!gs.board().blockAt(c).isFree())
-                ByteList.add(ExplosionPainter.BYTE_FOR_EMPTY);
+                temp.add(ExplosionPainter.BYTE_FOR_EMPTY);
             
             else if(gs.blastedCells().contains(c))
-                ByteList.add(ExplosionPainter.byteForBlast(gs.blastedCells().contains(c.neighbor(Direction.N)), gs.blastedCells().contains(c.neighbor(Direction.E)), gs.blastedCells().contains(c.neighbor(Direction.S)), gs.blastedCells().contains(c.neighbor(Direction.W))));
+                temp.add(ExplosionPainter.byteForBlast(gs.blastedCells().contains(c.neighbor(Direction.N)), gs.blastedCells().contains(c.neighbor(Direction.E)), gs.blastedCells().contains(c.neighbor(Direction.S)), gs.blastedCells().contains(c.neighbor(Direction.W))));
             
             else if(gs.bombedCells().containsKey(c))
-                ByteList.add(ExplosionPainter.byteForBomb(gs.bombedCells().get(c)));
+                temp.add(ExplosionPainter.byteForBomb(gs.bombedCells().get(c)));
             
             
             else
-                ByteList.add(ExplosionPainter.BYTE_FOR_EMPTY);
+                temp.add(ExplosionPainter.BYTE_FOR_EMPTY);
             
         }
+        
+        ByteList.add((byte)temp.size());
+        ByteList.addAll(RunLengthEncoder.encode(temp));
+        temp.clear();
         
         for (Player p : gs.players()) {
             ByteList.add((byte) p.lives());
