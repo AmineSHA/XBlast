@@ -36,11 +36,10 @@ public final class GameStateSerializer {
         
         for (Cell c : Cell.SPIRAL_ORDER) 
         temp.add(bp.byteForCell(gs.board(), c));
-        
-        ByteList.add((byte)temp.size());
-        ByteList.addAll(RunLengthEncoder.encode(temp));
+
+        ByteList.addAll(encoder(temp));
         temp.clear();
-        
+
         for (Cell c : Cell.ROW_MAJOR_ORDER) {
             if(!gs.board().blockAt(c).isFree())
                 temp.add(ExplosionPainter.BYTE_FOR_EMPTY);
@@ -57,8 +56,7 @@ public final class GameStateSerializer {
             
         }
         
-        ByteList.add((byte)temp.size());
-        ByteList.addAll(RunLengthEncoder.encode(temp));
+        ByteList.addAll(encoder(temp));
         temp.clear();
         
         for (Player p : gs.players()) {
@@ -72,5 +70,18 @@ public final class GameStateSerializer {
         
         return ByteList;
         
+    }
+    
+    /**
+     * encode a byte list and put its size at index 0
+     * @param temp
+     *          the list to encode
+     * @return an encoded list with it's size at index 0
+     */
+    private static List<Byte> encoder(List<Byte> temp){
+
+        temp=RunLengthEncoder.encode(temp);
+        temp.add(0, (byte)temp.size());
+        return temp;
     }
 }
