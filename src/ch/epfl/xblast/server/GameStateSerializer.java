@@ -38,6 +38,7 @@ public final class GameStateSerializer {
         temp.add(bp.byteForCell(gs.board(), c));
 
         ByteList.addAll(encoder(temp));
+
         temp.clear();
 
         for (Cell c : Cell.ROW_MAJOR_ORDER) {
@@ -57,6 +58,7 @@ public final class GameStateSerializer {
         }
         
         ByteList.addAll(encoder(temp));
+
         temp.clear();
         
         for (Player p : gs.players()) {
@@ -68,7 +70,7 @@ public final class GameStateSerializer {
         
         ByteList.add((byte)Math.ceil(gs.remainingTime()/2));
         
-        return ByteList;
+        return RunLengthEncoder.decode(ByteList);
         
     }
     
