@@ -70,7 +70,8 @@ public final class GameStateSerializer {
         
         ByteList.add((byte)Math.ceil(gs.remainingTime()/2));
         
-        return RunLengthEncoder.decode(ByteList);
+//        return RunLengthEncoder.decode(ByteList);
+        return ByteList;
         
     }
     
