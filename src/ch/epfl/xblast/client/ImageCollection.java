@@ -11,6 +11,12 @@ import javax.imageio.ImageIO;
 public final class ImageCollection {
     
     private final Map<Integer, Image> imageMap = new HashMap<>();
+    
+    static public ImageCollection playerCollection = new ImageCollection("player");
+    static public ImageCollection explosionsBombsCollection = new ImageCollection(
+            "explosion");
+    static public ImageCollection BoardCollection = new ImageCollection("block");
+    static public ImageCollection timeAndScoreCollection = new ImageCollection("score");
 
     public ImageCollection(String name) {
         String dirName = name; // p.ex. "player"

@@ -11,6 +11,7 @@ import ch.epfl.xblast.PlayerID;
 import ch.epfl.xblast.RunLengthEncoder;
 import ch.epfl.xblast.SubCell;
 import ch.epfl.xblast.client.GameState.Player;
+import ch.epfl.xblast.server.debug.Timer;
 
 /**
  * 
@@ -34,7 +35,6 @@ public class GameStateDeserializer {
     }
 
     public static GameState deserializeGameState(List<Byte> encoded) {
-
         int boardListMark = encoded.get(0) + 1;
         int splosionsListMark = encoded.get(boardListMark) + boardListMark + 1;
         int playerPortionSize = PlayerID.values().length
@@ -46,12 +46,13 @@ public class GameStateDeserializer {
         // getting the image list of the board, the explosions, and the players
         List<Image> boardImage = deserializeBoardAndRowMajoredIt(
                 RunLengthEncoder.decode(encodedCopy.subList(1, boardListMark)));
+
         List<Image> splosions = deserializeExplosions(RunLengthEncoder.decode(
                 encodedCopy.subList(boardListMark + 1, splosionsListMark)));
         List<Player> players = deserializePlayers(encodedCopy.subList(
                 splosionsListMark, splosionsListMark + playerPortionSize));
 
-        ImageCollection timeAndScoreCollection = new ImageCollection("score");
+        ImageCollection timeAndScoreCollection = ImageCollection.timeAndScoreCollection;
         List<Image> scoreLine = new ArrayList<>();
         for (int i = 0; i < players.size(); i++) {
             // playerValue is the correct sprite group in image.score
@@ -82,7 +83,6 @@ public class GameStateDeserializer {
         for (int i = 0; i < MAX_TIME - time; i++) {
             timeLine.add(empty);
         }
-
         return new GameState(players, boardImage, splosions, scoreLine,
                 timeLine);
 
@@ -91,7 +91,7 @@ public class GameStateDeserializer {
     private static List<Image> deserializeBoardAndRowMajoredIt(
             List<Byte> decodedBoard) {
 
-        ImageCollection BoardCollection = new ImageCollection("block");
+        ImageCollection BoardCollection = ImageCollection.BoardCollection;
         Image board[] = new Image[Cell.COUNT];
 
         for (int i = 0; i < Cell.COUNT; i++) {
@@ -107,8 +107,7 @@ public class GameStateDeserializer {
     private static List<Image> deserializeExplosions(
             List<Byte> encodedExplosionsBombs) {
 
-        ImageCollection explosionsBombsCollection = new ImageCollection(
-                "explosion");
+        ImageCollection explosionsBombsCollection = ImageCollection.explosionsBombsCollection;
         List<Image> explosionBomb = new ArrayList<>();
 
         for (Byte b : encodedExplosionsBombs)
@@ -120,20 +119,19 @@ public class GameStateDeserializer {
 
     // methode testee(pour la re tester il faut la passer en private)
     private static List<Player> deserializePlayers(List<Byte> encodedPlayers) {
-
         List<Byte> temp = new ArrayList<>(encodedPlayers);
-
-        ImageCollection playerCollection = new ImageCollection("player");
+        ImageCollection playerCollection = ImageCollection.playerCollection;
         List<Player> playerList = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            playerList.add(new Player(PlayerID.values()[i],
-                    Byte.toUnsignedInt(temp.get(0)),
-                    new SubCell(Byte.toUnsignedInt(temp.get(1)),
-                            Byte.toUnsignedInt(temp.get(2))),
-                    playerCollection.imageOrNull(temp.get(3))));
+        for (int i = 0; i < PlayerID.values().length * 4; i += 4) {
+            playerList.add(new Player(PlayerID.values()[i / 4],
+                    Byte.toUnsignedInt(temp.get(i % 4)),
+                    new SubCell(Byte.toUnsignedInt(temp.get(i % 4 + 1)),
+                            Byte.toUnsignedInt(temp.get(i % 4 + 2))),
+                    playerCollection.imageOrNull(temp.get(i % 4 + 3))));
             temp = temp.subList(4, temp.size());
 
         }
+
         return playerList;
     }
 

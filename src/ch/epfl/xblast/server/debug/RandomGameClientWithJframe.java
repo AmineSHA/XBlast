@@ -92,9 +92,8 @@ public class RandomGameClientWithJframe {
             }
             P1Action = null;
             game = game.next(dirOpt, bombs);
-            for(PlayerID p:PlayerID.values())
                 xbc.setGameState(GameStateDeserializer.deserializeGameState(
-                        GameStateSerializer.serialize(BP, game)), p);
+                        GameStateSerializer.serialize(BP, game)), PlayerID.PLAYER_1);
             long after = System.currentTimeMillis();
             System.out.println(after-before);
             if((after-before>1000/Ticks.TICKS_PER_SECOND))

@@ -5,6 +5,8 @@ import ch.epfl.xblast.*;
 import ch.epfl.xblast.server.Player.DirectedPosition;
 import ch.epfl.xblast.server.Player.LifeState;
 import ch.epfl.xblast.server.Player.LifeState.State;
+import ch.epfl.xblast.server.debug.Timer;
+
 import java.util.*;
 
 /**
@@ -218,9 +220,9 @@ final public class GameState {
     public GameState next(Map<PlayerID, Optional<Direction>> speedChangeEvents,
             Set<PlayerID> bombDropEvents) {
 
+        Timer.SetLapLimit(10);
         List<Sq<Cell>> blasts1 = nextBlasts(this.blasts, this.board,
                 this.explosions);
-
         Set<Cell> BlastedCells1 = new HashSet<>();
         for (Sq<Cell> c : blasts1)
             BlastedCells1.add(c.head());
@@ -229,7 +231,6 @@ final public class GameState {
          * for nextplayer
          */
 
-        
         Set<Cell> consumedBonuses = new HashSet<>();
         for (Player p : players) {
             SubCell sub = p.position();
@@ -241,7 +242,6 @@ final public class GameState {
             }
         }
         
-
         Board board1 = nextBoard(this.board, consumedBonuses, BlastedCells1);
 
         List<Sq<Sq<Cell>>> explosions1 = nextExplosions(this.explosions);
@@ -258,9 +258,7 @@ final public class GameState {
             else
                 bombs1.add(new Bomb(b.ownerId(), b.position(),
                         b.fuseLengths().tail().head(), b.range()));
-
         }
-
         Set<Cell> bombedCells1Set = new HashSet<>();
         for (Bomb b : bombs1)
             bombedCells1Set.add(b.position());
@@ -268,6 +266,7 @@ final public class GameState {
         List<Player> Player1 = nextPlayers(this.players, playerBonuses1,
                 bombedCells1Set, board1, BlastedCells1, speedChangeEvents);
 
+        
         return new GameState(this.ticks + 1, board1, Player1, bombs1,
                 explosions1, blasts1);
 
