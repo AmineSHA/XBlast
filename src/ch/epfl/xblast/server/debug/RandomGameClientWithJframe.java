@@ -50,7 +50,7 @@ public class RandomGameClientWithJframe {
         xbc.requestFocusInWindow();
         JFrame jfr = new JFrame();
         jfr.setTitle("Test Xblast GUI : Random Game");
-        jfr.setResizable(false);
+        jfr.setResizable(true);
         jfr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jfr.add(xbc);
         jfr.pack();

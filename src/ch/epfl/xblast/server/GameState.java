@@ -218,7 +218,7 @@ final public class GameState {
     public GameState next(Map<PlayerID, Optional<Direction>> speedChangeEvents,
             Set<PlayerID> bombDropEvents) {
 
-        List<Sq<Cell>> blasts1 = GameState.nextBlasts(this.blasts, this.board,
+        List<Sq<Cell>> blasts1 = nextBlasts(this.blasts, this.board,
                 this.explosions);
 
         Set<Cell> BlastedCells1 = new HashSet<>();
@@ -346,7 +346,7 @@ final public class GameState {
                                 Block.CRUMBLING_WALL)
                         .concat(generateRandomSequence()));
 
-            else if (board0.blockAt(c).name().contains("BONUS")
+            else if (board0.blockAt(c).isBonus()
                     && blastedCells1.contains(c))
                 boardArgument.add(
                         board0.blocksAt(c).limit(Ticks.BONUS_DISAPPEARING_TICKS)
@@ -452,7 +452,7 @@ final public class GameState {
             modifyPlayers.add(tempPlayer);
 
         }
-
+//TODO +0: Au lieu dâ€™ajouter les 4 joueurs Ã  la main, vous pouvez utiliser PlayerID.values().
         return modifyPlayers;
     }
 

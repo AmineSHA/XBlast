@@ -93,49 +93,22 @@ public final class Board {
         checkBlockMatrix(innerBlocks, (EDGLESS_ROW), (EDGLESS_COLUMNS));
         List<List<Block>> walled = new ArrayList<List<Block>>();
 
-        for (int i = 0; i < (EDGLESS_ROW); i++) {
-            walled.add(new ArrayList<Block>());
-            for (int j = 0; j < (Cell.COLUMNS); j++) {
-
-                if (j == 0)
-                    walled.get(i).add(Block.INDESTRUCTIBLE_WALL);
-
-                else if (j == Cell.COLUMNS - 1)
-                    walled.get(i).add(Block.INDESTRUCTIBLE_WALL);
-
-                else
-                    walled.get(i).add(innerBlocks.get(i).get(j - 1));
-
-            }
-
+        walled.add(Collections.nCopies(Cell.COLUMNS, Block.INDESTRUCTIBLE_WALL));
+        
+        for (List<Block> l : innerBlocks) {
+            List<Block>tmp = new ArrayList<Block>();
+            tmp.add(Block.INDESTRUCTIBLE_WALL);
+            tmp.addAll(new ArrayList<>(l));
+            tmp.add(Block.INDESTRUCTIBLE_WALL);
+            walled.add(tmp);
         }
-        /*
-         * TODO
-         * +0: Attention Ã  l'optimisation ! 
-         * (utiliser la mÃ©thode "Collections.nCopies()"
-         *  Ã  la place de votre mÃ©thode "indestructibleRow()"
-         *  , attention aussi a l'utilisation de 
-         *  walled.add(0,...) qui prend un temps 
-         *  O(walled.size) Ã  s'exÃ©cuter)
-         */
-        walled.add(0, indestructibleRow());
-        walled.add(indestructibleRow());
+       
+        walled.add(Collections.nCopies(Cell.COLUMNS, Block.INDESTRUCTIBLE_WALL));
 
         return ofRows(walled);
     }
 
-    /**
-     * Constructs a Cell.COLUMNS long row
-     * 
-     * @return a INDESTRUCTIBLE_WALL filled row
-     */
-    public static List<Block> indestructibleRow() {
-        List<Block> temp = new ArrayList<Block>();
-        for (int i = 0; i < Cell.COLUMNS; i++)
-            temp.add(Block.INDESTRUCTIBLE_WALL);
 
-        return temp;
-    }
 
     /**
      * create a full board (with edge) from 1/4 edgeless board by mirroring it
@@ -148,13 +121,9 @@ public final class Board {
     public static Board ofQuadrantNWBlocksWalled(
             List<List<Block>> quadrantNWBlocks) {
 
-        /*
-         * TODO
-         * +0: L'utilisation de "Math.floor()" est inutile
-         *  dans l'appel Ã  "checkBlockMatrix()"
-         */
-        checkBlockMatrix(quadrantNWBlocks, (int) Math.floor(Cell.ROWS / 2),
-                (int) Math.floor(Cell.COLUMNS / 2));
+
+        checkBlockMatrix(quadrantNWBlocks, Cell.ROWS / 2,
+                 Cell.COLUMNS / 2);
         List<List<Block>> NWQuadrant = new ArrayList<List<Block>>(
                 quadrantNWBlocks);
 
