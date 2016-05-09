@@ -12,18 +12,25 @@ import java.util.ArrayList;
 
 import ch.epfl.xblast.PlayerID;
 import ch.epfl.xblast.client.GameState.Player;
-
+/**
+ * 
+ * @author Amine Chaouachi (260709) / Alban Favre (260025)
+ *
+ */
 public final class XBlastComponent extends JComponent {
 	GameState gs;
 	PlayerID id;
-	List<Integer> textPoss = new ArrayList<>();
+	List<Integer> textPoss = new ArrayList<>(Arrays.asList(96, 240, 768, 912));
 
 	public Dimension getPreferredSize() {
-		return new Dimension(960, 388);
+		return new Dimension(960, 688);
 	}
 
 	protected void paintComponent(Graphics g0) {
+	       if(gs ==null || id ==null)
+	            return;
 		Graphics2D g = (Graphics2D) g0;
+
 		int cumulativeBoardCoord = 0;
 		int cumulativeScoreCoord = 0;
 		int cumulativeTimeCoord = 0;
@@ -44,12 +51,11 @@ public final class XBlastComponent extends JComponent {
 
 		}
 
-		textPoss.addAll(Arrays.asList(96, 240, 768, 912));
 		Font font = new Font("Arial", Font.BOLD, 25);
 		g.setColor(Color.WHITE);
 		g.setFont(font);
 
-		for (int i = 0; i < textPoss.size(); i++) {
+		for (int i = 0; i < 4; i++) {
 			g.drawString(Integer.toString(gs.players().get(i).lives()),
 					textPoss.get(i), 659);
 

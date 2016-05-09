@@ -1,9 +1,14 @@
 package ch.epfl.xblast.client;
 import java.awt.event.*;
-import ch.epfl.xblast.server.PlayerAction;
 import java.util.*;
 import java.util.function.Consumer;
 
+import ch.epfl.xblast.PlayerAction;
+/**
+ * 
+ * @author Amine Chaouachi (260709) / Alban Favre (260025)
+ *
+ */
 public class KeyboardEventHandler extends KeyAdapter {
 
     
@@ -11,8 +16,8 @@ public class KeyboardEventHandler extends KeyAdapter {
     Consumer<PlayerAction> consumer;
     
     public KeyboardEventHandler(Map<Integer,PlayerAction> keyMap,Consumer<PlayerAction> e){
-    this.keyMap=keyMap;
-    this.consumer=consumer; 
+    this.keyMap=new HashMap<Integer, PlayerAction>(keyMap);
+    this.consumer=e; 
     }
     
     public void keyPressed(KeyEvent e){

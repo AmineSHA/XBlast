@@ -1,5 +1,9 @@
-package ch.epfl.xblast.server;
-
+package ch.epfl.xblast;
+/**
+ * 
+ * @author Amine Chaouachi (260709) / Alban Favre (260025)
+ *
+ */
 public enum PlayerAction {
 
     JOIN_GAME,

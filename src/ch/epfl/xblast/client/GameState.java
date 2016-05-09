@@ -11,7 +11,11 @@ private final List<Image> boardImages;
 private final List<Image> bombsAndExplosionsImages;
 private final List<Image> scoreLine;
 private final List<Image> timeLine;
-
+/**
+ * 
+ * @author Amine Chaouachi (260709) / Alban Favre (260025)
+ *
+ */
 public GameState(List<Player> players, List<Image> boardImages,
         List<Image> bombsAndExplosionsImages, List<Image> scoreLine,
         List<Image> timeLine) {
