@@ -109,6 +109,15 @@ public final class Board {
             }
 
         }
+        /*
+         * TODO
+         * +0: Attention Ã  l'optimisation ! 
+         * (utiliser la mÃ©thode "Collections.nCopies()"
+         *  Ã  la place de votre mÃ©thode "indestructibleRow()"
+         *  , attention aussi a l'utilisation de 
+         *  walled.add(0,...) qui prend un temps 
+         *  O(walled.size) Ã  s'exÃ©cuter)
+         */
         walled.add(0, indestructibleRow());
         walled.add(indestructibleRow());
 
@@ -139,6 +148,11 @@ public final class Board {
     public static Board ofQuadrantNWBlocksWalled(
             List<List<Block>> quadrantNWBlocks) {
 
+        /*
+         * TODO
+         * +0: L'utilisation de "Math.floor()" est inutile
+         *  dans l'appel Ã  "checkBlockMatrix()"
+         */
         checkBlockMatrix(quadrantNWBlocks, (int) Math.floor(Cell.ROWS / 2),
                 (int) Math.floor(Cell.COLUMNS / 2));
         List<List<Block>> NWQuadrant = new ArrayList<List<Block>>(

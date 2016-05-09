@@ -70,6 +70,13 @@ public enum Block {
      * @return true if it can cast shadows
      */
     public boolean castsShadow() {
+        /*TODO
+         * La mÃ©thode "castsShadow()" est mal 
+         * pensÃ©e (mÃªme si elle fonctionne, 
+         * faire un test sur le nom de l'Ã©lÃ©ment 
+         * dans l'Ã©numÃ©ration est en gÃ©nÃ©ral 
+         * une mauvaise idÃ©e)
+         */
         return this.name().contains("_WALL");
     }
 

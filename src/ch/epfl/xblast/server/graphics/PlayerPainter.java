@@ -15,6 +15,7 @@ public final class PlayerPainter {
      * the player multiplier is the integer value that mark the jump between two players sprites group
      * for example the absolute value of the difference of player x and player y (abs(playerX-playerY))
      * will always be PLAYER_MULTIPLIER*n where n is a positive integer.
+     * (a sprite is the name for an animation image in videogames)
      */
     private static final int PLAYER_MULTIPLIER=20;
     private static final int PLAYER_WHITE=80;

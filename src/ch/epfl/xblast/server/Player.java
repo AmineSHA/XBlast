@@ -275,8 +275,8 @@ final public class Player {
             return "( " + lives + ", " + state + ")";
         }
 
-        private int lives;
-        private State state;
+        final private int lives;
+        final private State state;
 
         /**
          * LifeState constructor
@@ -327,8 +327,8 @@ final public class Player {
      *
      */
     public static class DirectedPosition {
-        private SubCell position;
-        private Direction direction;
+        final private SubCell position;
+        final private Direction direction;
 
         @Override
         public String toString() {

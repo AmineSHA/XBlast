@@ -553,9 +553,14 @@ final public class GameState {
 
     /**
      * applies takeWhile
-     * 
+     * (we created this method for 2 raisons:
+     * 1: it makes the code lighter
+     * 2: for some reason, using sq.takeWhile 
+     * in a for each loop made the object (in nextPlayer it's c)
+     * unusable, we found it easier to just get sq.takeWhile out of
+     * the for each loop, than reworking our code without a
+     * for each loop)
      * @param j
-     * @param d
      * @return Sq<DirectedPosition>
      */
     static private Sq<DirectedPosition> takewhileMeth(Sq<DirectedPosition> j) {
@@ -564,9 +569,14 @@ final public class GameState {
 
     /**
      * applies findFirst
-     * 
+     * (we created this method for 2 raisons:
+     * 1: it makes the code lighter
+     * 2: for some reason, using sq.findFirst
+     * in a for each loop made the object (in nextPlayer it's c)
+     * unusable, we found it easier to just get sq.findFirst out of
+     * the for each loop, than reworking our code without a
+     * for each loop)
      * @param j
-     * @param d
      * @return DirectedPosition
      */
     static private DirectedPosition findFirstMeth(Sq<DirectedPosition> j) {

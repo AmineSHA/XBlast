@@ -28,11 +28,11 @@ public interface Ticks {
     /**
      * the wall crumbling ticks
      */
-    public static int WALL_CRUMBLING_TICKS = 30;
+    public static int WALL_CRUMBLING_TICKS = EXPLOSION_TICKS;
     /**
      * the bonus disappearing ticks
      */
-    public static int BONUS_DISAPPEARING_TICKS = 30;
+    public static int BONUS_DISAPPEARING_TICKS = EXPLOSION_TICKS;
     /**
      * the ticks per second
      */
