@@ -63,7 +63,7 @@ public final class XBlastComponent extends JComponent {
             
 
         }
-            //TODO remplacer impact par Arial
+            //TODO remplacer police par Arial
         Font font = new Font("Papyrus", Font.BOLD, 25);
         g.setColor(Color.WHITE);
         g.setFont(font);

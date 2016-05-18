@@ -294,7 +294,7 @@ final public class GameState {
                 blasts1.add(r.tail());
 
         for (Sq<Sq<Cell>> f : explosions0)
-            if (!f.head().isEmpty() && board0.blockAt(f.head().head()).isFree())
+            if (!f.head().isEmpty() && board0.blockAt(f.head().head()).canHostPlayer())
                 blasts1.add(f.head());
 
         return blasts1;

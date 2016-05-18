@@ -12,14 +12,20 @@ import ch.epfl.xblast.PlayerAction;
 public class KeyboardEventHandler extends KeyAdapter {
 
     
-    Map<Integer,PlayerAction> keyMap;
-    Consumer<PlayerAction> consumer;
+     final private Map<Integer,PlayerAction> keyMap;
+     final private Consumer<PlayerAction> consumer;
     
+    /**
+     * KeyboardEventHandler constructor
+     * @param keyMap
+     * @param e
+     */
     public KeyboardEventHandler(Map<Integer,PlayerAction> keyMap,Consumer<PlayerAction> e){
     this.keyMap=new HashMap<Integer, PlayerAction>(keyMap);
     this.consumer=e; 
     }
     
+    @Override
     public void keyPressed(KeyEvent e){
         if(keyMap.containsKey(e.getKeyCode()))
             consumer.accept(keyMap.get(e.getKeyCode()));

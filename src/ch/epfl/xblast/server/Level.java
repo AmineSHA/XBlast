@@ -54,6 +54,7 @@ public final class Level {
         
         Block XX=Block.INDESTRUCTIBLE_WALL;
         Block cc=Block.DESTRUCTIBLE_WALL;
+        
         Block __=Block.FREE;
         Board b=Board.ofQuadrantNWBlocksWalled(Arrays.asList(
 
