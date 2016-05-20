@@ -1,6 +1,7 @@
 package ch.epfl.xblast.client;
 
 import java.awt.Image;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,7 +12,6 @@ import ch.epfl.xblast.PlayerID;
 import ch.epfl.xblast.RunLengthEncoder;
 import ch.epfl.xblast.SubCell;
 import ch.epfl.xblast.client.GameState.Player;
-import ch.epfl.xblast.server.debug.Timer;
 
 /**
  * 
@@ -34,7 +34,16 @@ public class GameStateDeserializer {
     private GameStateDeserializer() {
     }
 
+    /**
+     * the client's game deserialiser
+     * @param encoded
+     *         a serialised gameState
+     * @return a deserialised gameState
+     */
     public static GameState deserializeGameState(List<Byte> encoded) {
+        if (encoded.equals(null)) {
+            
+        }
         int boardListMark = encoded.get(0) + 1;
         int splosionsListMark = encoded.get(boardListMark) + boardListMark + 1;
         int playerPortionSize = PlayerID.values().length
@@ -117,7 +126,7 @@ public class GameStateDeserializer {
 
     }
 
-    // methode testee(pour la re tester il faut la passer en private)
+    // methode testee(pour la re tester il faut la passer en public)
     private static List<Player> deserializePlayers(List<Byte> encodedPlayers) {
         List<Byte> temp = new ArrayList<>(encodedPlayers);
         ImageCollection playerCollection = ImageCollection.playerCollection;

@@ -59,6 +59,10 @@ public class RandomGameClientWithJframe {
         for(PlayerID p:PlayerID.values())
             xbc.setGameState(GameStateDeserializer.deserializeGameState(
                     GameStateSerializer.serialize(BP, game)), p);
+        
+        
+        
+        
         while (!game.isGameOver()) {
             long before = System.currentTimeMillis();
             Map<PlayerID,Optional<Direction>> dirOpt = new HashMap<>(REG.randomSpeedChangeEvents());
@@ -101,15 +105,26 @@ public class RandomGameClientWithJframe {
                 System.out.println("TOO FAST");
             try {
                 Thread.sleep((after-before>1000/Ticks.TICKS_PER_SECOND)?0:1000/Ticks.TICKS_PER_SECOND-(after-before));
-            } catch (InterruptedException e) {
+            }
+            
+            catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
         }
+        //game is over
+        xbc.endScreenSwitch();
+        
+        
         try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
+           
+                Thread.sleep(8000);
+                
+            
+        } 
+        
+        catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

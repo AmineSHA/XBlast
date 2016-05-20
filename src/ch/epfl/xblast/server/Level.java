@@ -22,11 +22,10 @@ public final class Level {
     private final BoardPainter bp;
     private final GameState gs;
 
-    
     /**
      * default level
      */
-    public final static Level DEFAULT_LEVEL=defaultLevel();
+    public final static Level DEFAULT_LEVEL = defaultLevel();
 
     /**
      * Construct a Level with a BoardPainter and a GameState
@@ -49,38 +48,33 @@ public final class Level {
         palette.put(Block.DESTRUCTIBLE_WALL, BlockImage.EXTRA);
         palette.put(Block.BONUS_BOMB, BlockImage.BONUS_BOMB);
         palette.put(Block.BONUS_RANGE, BlockImage.BONUS_RANGE);
-        
-        
-        
-        Block XX=Block.INDESTRUCTIBLE_WALL;
-        Block cc=Block.DESTRUCTIBLE_WALL;
-        
-        Block __=Block.FREE;
-        Board b=Board.ofQuadrantNWBlocksWalled(Arrays.asList(
 
-               Arrays.asList(__,__,__,__,__,cc,__),
-               Arrays.asList(__,XX,cc,XX,cc,XX,cc),
-               Arrays.asList(__,cc,__,__,__,cc,__),
-               Arrays.asList(cc,XX,__,XX,XX,XX,XX),
-               Arrays.asList(__,cc,__,cc,__,__,__),
-               Arrays.asList(cc,XX,cc,XX,cc,XX,__)
-               ));
-        
-        
-        
-        List<Player> p=new ArrayList<Player>();
+        Block XX = Block.INDESTRUCTIBLE_WALL;
+        Block cc = Block.DESTRUCTIBLE_WALL;
+        Block __ = Block.FREE;
+        Board b = Board.ofQuadrantNWBlocksWalled(Arrays.asList(
+
+                Arrays.asList(__, __, __, __, __, cc, __),
+                Arrays.asList(__, XX, cc, XX, cc, XX, cc),
+                Arrays.asList(__, cc, __, __, __, cc, __),
+                Arrays.asList(cc, XX, __, XX, XX, XX, XX),
+                Arrays.asList(__, cc, __, cc, __, __, __),
+                Arrays.asList(cc, XX, cc, XX, cc, XX, __)));
+
+        List<Player> p = new ArrayList<Player>();
         p.add(new Player(PlayerID.PLAYER_1, 3, new Cell(1, 1), 2, 3));
         p.add(new Player(PlayerID.PLAYER_2, 3, new Cell(13, 1), 2, 3));
         p.add(new Player(PlayerID.PLAYER_3, 3, new Cell(13, 11), 2, 3));
         p.add(new Player(PlayerID.PLAYER_4, 3, new Cell(1, 11), 2, 3));
-        
-        return new Level(new BoardPainter(palette, BlockImage.IRON_FLOOR_S), new GameState(b, p));
 
-        
+        return new Level(new BoardPainter(palette, BlockImage.IRON_FLOOR_S),
+                new GameState(b, p));
+
     }
 
     /**
      * boardPainter getter
+     * 
      * @return the boardPainter
      */
     public BoardPainter boardPainter() {
@@ -89,6 +83,7 @@ public final class Level {
 
     /**
      * gameState getter
+     * 
      * @return the gameState
      */
     public GameState gameState() {

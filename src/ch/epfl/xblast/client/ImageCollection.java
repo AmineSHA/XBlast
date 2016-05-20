@@ -7,17 +7,38 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 import javax.imageio.ImageIO;
-
+/**
+ * 
+ * @author Amine Chaouachi (260709) / Alban Favre (260025)
+ *
+ */
 public final class ImageCollection {
     
     private final Map<Integer, Image> imageMap = new HashMap<>();
     
-    static public ImageCollection playerCollection = new ImageCollection("player");
-    static public ImageCollection explosionsBombsCollection = new ImageCollection(
+    /**
+     * player collection
+     */
+    static public final ImageCollection playerCollection = new ImageCollection("player");
+    /**
+     * explosions and bombs collection
+     */
+    static public final ImageCollection explosionsBombsCollection = new ImageCollection(
             "explosion");
-    static public ImageCollection BoardCollection = new ImageCollection("block");
-    static public ImageCollection timeAndScoreCollection = new ImageCollection("score");
+    /**
+     * Board Collection
+     */
+    static public final ImageCollection BoardCollection = new ImageCollection("block");
+    /**
+     * time and score collection
+     */
+    static public final ImageCollection timeAndScoreCollection = new ImageCollection("score");
 
+    /**
+     * A vital method for printing image
+     * @param name
+     *      the folder name
+     */
     public ImageCollection(String name) {
         String dirName = name; // p.ex. "player"
         try {
@@ -41,12 +62,25 @@ public final class ImageCollection {
 
     }
 
+    /**
+     * An image getter (butt will not work with invalid sprite)
+     * @param index
+     *          index
+     * @return image at index index
+     */
     public Image image(int index) {
         if (!imageMap.containsKey(index))
             throw new NoSuchElementException();
         return imageMap.get(index);
     }
 
+    /**
+     * An image getter (that work with invalid sprite)
+     * (if sprite is invalid, the image will not be, so it looks like there is nothing)
+     * @param index
+     *          index
+     * @return image at index index
+     */
     public Image imageOrNull(int index) {
         if (!imageMap.containsKey(index))
             return null;

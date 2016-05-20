@@ -2,13 +2,13 @@ package ch.epfl.xblast.client;
 
 import java.awt.*;
 
+
 import javax.swing.JComponent;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
-import java.lang.Math;
 import ch.epfl.xblast.PlayerID;
 import ch.epfl.xblast.client.GameState.Player;
 import ch.epfl.xblast.Cell;
@@ -18,9 +18,11 @@ import ch.epfl.xblast.Cell;
  *
  */
 public final class XBlastComponent extends JComponent {
-    GameState gs;
-    PlayerID id;
-    List<Integer> textPoss = new ArrayList<>(Arrays.asList(96, 240, 768, 912));
+
+    private boolean endScreen=false;
+    private GameState gs;
+    private PlayerID id;
+    private List<Integer> textPoss = new ArrayList<>(Arrays.asList(96, 240, 768, 912));
 
     public Dimension getPreferredSize() {
         return new Dimension(960, 688);
@@ -41,7 +43,10 @@ public final class XBlastComponent extends JComponent {
             if (gs.bombsAndExplosionsImage().get(i) != null)
                 g.drawImage(gs.bombsAndExplosionsImage().get(i),
                         cumulativeCoordX, cumulativeCoordY, null);
+            
             cumulativeCoordX+=gs.boardImages().get(i).getWidth(null);
+        
+            
             if(i%Cell.COLUMNS==Cell.COLUMNS-1){
                 cumulativeCoordY+=gs.boardImages().get(i).getHeight(null);
                 cumulativeCoordX = 0;
@@ -64,7 +69,7 @@ public final class XBlastComponent extends JComponent {
 
         }
             //TODO remplacer police par Arial
-        Font font = new Font("Papyrus", Font.BOLD, 25);
+        Font font = new Font("Segoe Print", Font.BOLD, 25);
         g.setColor(Color.WHITE);
         g.setFont(font);
 
@@ -95,11 +100,35 @@ public final class XBlastComponent extends JComponent {
                     .y() - 52, null);
         }
 
+        if(endScreen){
+         
+
+            g.setColor(Color.WHITE);
+            g.setFont(font);
+            g.drawString("A WINNER IS BORN !(BUT IT MAY BE A DRAW)", 960/6, 688/2);
+        }
     }
 
+    /**
+     * Set the GameState that will be printed
+     * @param gs
+     *          a GameState
+     * @param id
+     *          a PlayerID
+     */
     public void setGameState(GameState gs, PlayerID id) {
         this.gs = gs;
         this.id = id;
+        repaint();
+    }
+    
+    
+    /**
+     * used to switch in end screen mode
+     * (endScreen mode is for when the game is finished)
+     */
+    public void endScreenSwitch(){
+        endScreen= !endScreen;
         repaint();
     }
 
