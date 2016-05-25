@@ -34,7 +34,6 @@ public class Main {
     private static DatagramChannel CHANNEL;
     private static SocketAddress   ADDRESS;
     private static int MAXIMUM_SERIALISED_BYTE = 409;
-    private PlayerID MYID;
 
     
     private static BoardPainter bp = Level.DEFAULT_LEVEL.boardPainter();
@@ -101,35 +100,39 @@ public class Main {
         ByteBuffer sendBuffer = ByteBuffer.allocate(1);
         ByteBuffer receiveBuffer = ByteBuffer.allocate(MAXIMUM_SERIALISED_BYTE);
     
-        System.out.println(receiveBuffer.get(MAXIMUM_SERIALISED_BYTE));
+        
         
         List<Byte> gsList = new ArrayList<>();
         CHANNEL.configureBlocking(false);
         do  {
             
             CHANNEL.receive(receiveBuffer);
-            System.out.println(receiveBuffer.toString()+"203");
+            System.out.println(receiveBuffer.toString()+"111");
             sendBuffer.clear(); 
             sendBuffer.put((byte) PlayerAction.JOIN_GAME.ordinal());
             sendBuffer.flip();
             CHANNEL.send(sendBuffer, ADDRESS);
             Thread.sleep(Time.CLIENT_WAIT_TIME);
-        }while(Objects.isNull(receiveBuffer.get(0)));
+        }while(receiveBuffer.get(0)==0);
         
+        System.out.println("END OF WHILE 1");
+//        CHANNEL.configureBlocking(true);
         while(true){
             
             receiveBuffer = ByteBuffer.allocate(MAXIMUM_SERIALISED_BYTE);
             receiveBuffer.clear();
+            receiveBuffer.rewind();
             CHANNEL.receive(receiveBuffer);
-            System.out.println(receiveBuffer.toString()+"25");
-            receiveBuffer.flip();
-            System.out.println(receiveBuffer.toString()+"4205");
-             PlayerID MYID = PlayerID.values()[receiveBuffer.get()];
+            System.out.println(receiveBuffer.toString()+"222");
+            receiveBuffer.rewind();
+            System.out.println(receiveBuffer.toString()+"333");
+            PlayerID myid = PlayerID.values()[receiveBuffer.get()-1];//jeej
+            System.out.println(myid);
             while (receiveBuffer.hasRemaining()) {
                 gsList.add(receiveBuffer.get());
             }
             gs = GameStateDeserializer.deserializeGameState(gsList);
-            xbc.setGameState(gs,MYID);
+            xbc.setGameState(gs,myid);
             gsList.clear();
             
             
