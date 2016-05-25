@@ -220,16 +220,20 @@ final public class GameState {
     public GameState next(Map<PlayerID, Optional<Direction>> speedChangeEvents,
             Set<PlayerID> bombDropEvents) {
 
+        //TODO enlever ce qui touche au debug:typiquement le timer
         Timer.SetLapLimit(10);
         List<Sq<Cell>> blasts1 = nextBlasts(this.blasts, this.board,
                 this.explosions);
         Set<Cell> BlastedCells1 = new HashSet<>();
         for (Sq<Cell> c : blasts1)
             BlastedCells1.add(c.head());
-        Map<PlayerID, Bonus> playerBonuses1 = new HashMap<>();/*
-         * this is used
+        
+        /*
+         * playerBonuses1 is used
          * for nextplayer
          */
+        Map<PlayerID, Bonus> playerBonuses1 = new HashMap<>();
+       
 
         Set<Cell> consumedBonuses = new HashSet<>();
         for (Player p : players) {
@@ -348,7 +352,7 @@ final public class GameState {
             else if (board0.blockAt(c).isBonus()
                     && blastedCells1.contains(c))
                 boardArgument.add(
-                        board0.blocksAt(c).limit(Ticks.BONUS_DISAPPEARING_TICKS)
+                        board0.blocksAt(c).tail().limit(Ticks.BONUS_DISAPPEARING_TICKS)
                         .concat(Sq.constant(Block.FREE)));
 
             else

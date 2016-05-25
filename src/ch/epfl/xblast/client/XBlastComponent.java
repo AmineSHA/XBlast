@@ -20,7 +20,7 @@ import ch.epfl.xblast.Cell;
 public final class XBlastComponent extends JComponent {
 
     private boolean endScreen=false;
-    private GameState gs;
+    private GameState gs=null;
     private PlayerID id;
     private List<Integer> textPoss = new ArrayList<>(Arrays.asList(96, 240, 768, 912));
 
@@ -40,7 +40,7 @@ public final class XBlastComponent extends JComponent {
         for (int i = 0; i < gs.boardImages().size(); i++) {
             
             g.drawImage(gs.boardImages().get(i), cumulativeCoordX, cumulativeCoordY, null);
-            if (gs.bombsAndExplosionsImage().get(i) != null)
+            if (i<=gs.bombsAndExplosionsImage().size()&&gs.bombsAndExplosionsImage().get(i) != null)
                 g.drawImage(gs.bombsAndExplosionsImage().get(i),
                         cumulativeCoordX, cumulativeCoordY, null);
             
@@ -101,11 +101,10 @@ public final class XBlastComponent extends JComponent {
         }
 
         if(endScreen){
-         
-
+            //TODO peut etre garder la partie dessous pour le bonus
             g.setColor(Color.WHITE);
             g.setFont(font);
-            g.drawString("A WINNER IS BORN !(BUT IT MAY BE A DRAW)", 960/6, 688/2);
+            g.drawString("Game is Over", 960/3, 688/2);
         }
     }
 
@@ -117,9 +116,12 @@ public final class XBlastComponent extends JComponent {
      *          a PlayerID
      */
     public void setGameState(GameState gs, PlayerID id) {
+        
+        if(gs!=null&&id!=null){
         this.gs = gs;
         this.id = id;
         repaint();
+        }
     }
     
     

@@ -18,10 +18,10 @@ public interface Time {
     /**
      * Microseconds per second
      */
-    public static int US_PER_S = 1000000;
+    public static int US_PER_S = MS_PER_S*1000;
     /**
      * nanoseconds per second
      */
-    public static int NS_PER_S = 1000000000;
+    public static int NS_PER_S = US_PER_S*1000;
 
 }

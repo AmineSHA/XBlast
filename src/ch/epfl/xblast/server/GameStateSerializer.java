@@ -43,7 +43,7 @@ public final class GameStateSerializer {
         temp.clear();
 
         for (Cell c : Cell.ROW_MAJOR_ORDER) {
-            if(!gs.board().blockAt(c).isFree())
+            if(!gs.board().blockAt(c).canHostPlayer())
                 temp.add(ExplosionPainter.BYTE_FOR_EMPTY);
             
             else if(gs.blastedCells().contains(c))
