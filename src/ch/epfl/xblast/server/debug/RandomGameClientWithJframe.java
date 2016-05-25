@@ -114,7 +114,7 @@ public class RandomGameClientWithJframe {
 
         }
         //game is over
-        xbc.endScreenSwitch();
+       
         
         
         try {

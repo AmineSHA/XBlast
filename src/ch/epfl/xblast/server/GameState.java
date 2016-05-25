@@ -220,8 +220,6 @@ final public class GameState {
     public GameState next(Map<PlayerID, Optional<Direction>> speedChangeEvents,
             Set<PlayerID> bombDropEvents) {
 
-        //TODO enlever ce qui touche au debug:typiquement le timer
-        Timer.SetLapLimit(10);
         List<Sq<Cell>> blasts1 = nextBlasts(this.blasts, this.board,
                 this.explosions);
         Set<Cell> BlastedCells1 = new HashSet<>();
@@ -455,7 +453,6 @@ final public class GameState {
             modifyPlayers.add(tempPlayer);
 
         }
-//TODO +0: Au lieu dâ€™ajouter les 4 joueurs Ã  la main, vous pouvez utiliser PlayerID.values().
         return modifyPlayers;
     }
 

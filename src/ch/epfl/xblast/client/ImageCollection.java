@@ -50,13 +50,11 @@ public final class ImageCollection {
                     imageMap.put(Integer.parseInt(f.getName().substring(0, 3)),
                             ImageIO.read(f));
                 } catch (NumberFormatException | IOException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
 
         } catch (URISyntaxException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

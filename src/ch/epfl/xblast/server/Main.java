@@ -9,7 +9,6 @@ import java.nio.channels.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,6 +23,11 @@ import ch.epfl.xblast.PlayerAction;
 import ch.epfl.xblast.PlayerID;
 import ch.epfl.xblast.Time;
 
+/**
+ * 
+ * @author Amine Chaouachi (260709) / Alban Favre (260025)
+ *
+ */
 public class Main {
 
     private static int NECES_PLAYERS = 4;
@@ -31,9 +35,14 @@ public class Main {
     static private Map<SocketAddress, PlayerID> addressID = new HashMap<>();
     static private BoardPainter bp = Level.DEFAULT_LEVEL.boardPainter();
     static private GameState gs = Level.DEFAULT_LEVEL.gameState();
-    Map<PlayerID, Optional<Direction>> speedChangeEvents = new HashMap<>();
-    Set<PlayerID> bombDropEvents = new HashSet<>();
 
+    /**
+     * main method, useful for the program's correct functioning
+     * @param args
+     *      numbers of players
+     * @throws InterruptedException
+     *      when interruptions occur
+     */
     public static void main(String args[]) throws InterruptedException {
 
         Map<PlayerID, Optional<Direction>> speedChangeEvents = new HashMap<>();
@@ -56,33 +65,47 @@ public class Main {
             SocketAddress senderAddress;
 
             while (addressID.size() < NECES_PLAYERS) {
+                System.out.println("while");
+                buffer.clear();
                 senderAddress = channel.receive(buffer);
-
+                System.out.println("received");
+                buffer.flip();
                 if (!(addressID.containsKey(senderAddress))
                         && buffer.get(0) == 0) {
 
+                    System.out.println("if");
                     senderAddress = channel.receive(buffer);
                     addressID.put(senderAddress,
                             PlayerID.values()[addressID.size()]);
-                    buffer.clear();
+
                 }
+                System.out.println("after if");
 
             }
+            System.out.println(addressID);
+            
+            
             // phase 2 part giving gameState
             long beginning = System.nanoTime();
             long nextTick = beginning;
             channel.configureBlocking(false);
             ByteBuffer b = ByteBuffer.allocate(MAXIMUM_SERIALISED_BYTE);
+            
             while (!gs.isGameOver()) {
 
+                System.out.println("game not over");
                 for (SocketAddress s : addressID.keySet()) {
-                    b.put((byte) (addressID.get(s).ordinal()));
-                    for (Byte e : dfBytes) {
+                    b.clear();
+                
+                    b.put((byte) (addressID.get(s).ordinal()+1));//we add 1 to avoid having 0 in buffer.get(0)
+                    
+                    for (Byte e : dfBytes) 
                         b.put(e);
-                    }
+                    
+                    
                     b.flip();
                     channel.send(b, s);
-                    b.clear();
+                    System.out.println("stuff sent");
                 }
 
                 // phase 2 part time
@@ -96,9 +119,10 @@ public class Main {
              // phase 2 part receive infos
                 for (SocketAddress s : addressID.keySet()) {
                     channel.receive(buffer);
+                    buffer.flip();
                     whatToDo.put(addressID.get(s),
                             PlayerAction.values()[buffer.get(0)]);
-                    buffer.clear();
+                    
                 }
 
                 // phase 2 part Compute nextGamestate
@@ -111,7 +135,6 @@ public class Main {
                         bombDropEvents.add(ID);
                     }
                 }
-
                 gs = gs.next(speedChangeEvents, bombDropEvents);
                 dfBytes = GameStateSerializer.serialize(bp, gs);
 
@@ -119,7 +142,6 @@ public class Main {
             System.out.println(gs.winner().isPresent()?"winner is player: " + gs.winner():"Draw");
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

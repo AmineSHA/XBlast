@@ -23,5 +23,9 @@ public interface Time {
      * nanoseconds per second
      */
     public static int NS_PER_S = US_PER_S*1000;
+    /**
+     * Client wait time
+     */
+    public static int CLIENT_WAIT_TIME = 500;
 
 }

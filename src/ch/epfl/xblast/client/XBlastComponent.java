@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.ArrayList;
 import ch.epfl.xblast.PlayerID;
 import ch.epfl.xblast.client.GameState.Player;
@@ -17,9 +18,11 @@ import ch.epfl.xblast.Cell;
  * @author Amine Chaouachi (260709) / Alban Favre (260025)
  *
  */
+@SuppressWarnings("serial")
 public final class XBlastComponent extends JComponent {
 
-    private boolean endScreen=false;
+
+
     private GameState gs=null;
     private PlayerID id;
     private List<Integer> textPoss = new ArrayList<>(Arrays.asList(96, 240, 768, 912));
@@ -29,8 +32,9 @@ public final class XBlastComponent extends JComponent {
     }
 
     protected void paintComponent(Graphics g0) {
-           if(gs ==null || id ==null)
+           if(Objects.isNull(gs))
                 return;
+           
         Graphics2D g = (Graphics2D) g0;
 
         int cumulativeCoordX = 0;
@@ -68,8 +72,8 @@ public final class XBlastComponent extends JComponent {
             
 
         }
-            //TODO remplacer police par Arial
-        Font font = new Font("Segoe Print", Font.BOLD, 25);
+
+        Font font = new Font("Arial", Font.BOLD, 25);
         g.setColor(Color.WHITE);
         g.setFont(font);
 
@@ -100,12 +104,7 @@ public final class XBlastComponent extends JComponent {
                     .y() - 52, null);
         }
 
-        if(endScreen){
-            //TODO peut etre garder la partie dessous pour le bonus
-            g.setColor(Color.WHITE);
-            g.setFont(font);
-            g.drawString("Game is Over", 960/3, 688/2);
-        }
+        
     }
 
     /**
@@ -117,7 +116,7 @@ public final class XBlastComponent extends JComponent {
      */
     public void setGameState(GameState gs, PlayerID id) {
         
-        if(gs!=null&&id!=null){
+        if(!Objects.isNull(gs)){
         this.gs = gs;
         this.id = id;
         repaint();
@@ -125,13 +124,6 @@ public final class XBlastComponent extends JComponent {
     }
     
     
-    /**
-     * used to switch in end screen mode
-     * (endScreen mode is for when the game is finished)
-     */
-    public void endScreenSwitch(){
-        endScreen= !endScreen;
-        repaint();
-    }
+    
 
 }
