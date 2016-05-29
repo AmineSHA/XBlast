@@ -24,6 +24,7 @@ import ch.epfl.xblast.client.GameStateDeserializer;
 import ch.epfl.xblast.server.Level;
 import ch.epfl.xblast.PlayerAction;
 import ch.epfl.xblast.server.graphics.BoardPainter;
+
 /**
  * 
  * @author Amine Chaouachi (260709) / Alban Favre (260025)
@@ -32,33 +33,56 @@ import ch.epfl.xblast.server.graphics.BoardPainter;
 public class Main {
 
     private static DatagramChannel CHANNEL;
-    private static SocketAddress   ADDRESS;
-    private static int MAXIMUM_SERIALISED_BYTE = 409;
+    private static SocketAddress ADDRESS;
+    private static int MAXIMUM_SERIALISED_BYTE = 420;
 
-    
     private static BoardPainter bp = Level.DEFAULT_LEVEL.boardPainter();
     private static PlayerAction thisPlayerAction = null;
-    
-    
+
     /**
      * Used to display
+     * 
      * @param xbc
-     *      xblastcomponent
+     *            xblastcomponent
      */
-    public static void createUI(XBlastComponent xbc){
-        
-        
-        
-        Map<Integer, PlayerAction> keyboardKeys =new HashMap<>();
+    public static void createUI(XBlastComponent xbc) {
+
+        Map<Integer, PlayerAction> keyboardKeys = new HashMap<>();
         keyboardKeys.put(KeyEvent.VK_UP, PlayerAction.MOVE_N);
         keyboardKeys.put(KeyEvent.VK_DOWN, PlayerAction.MOVE_S);
         keyboardKeys.put(KeyEvent.VK_LEFT, PlayerAction.MOVE_W);
         keyboardKeys.put(KeyEvent.VK_RIGHT, PlayerAction.MOVE_E);
         keyboardKeys.put(KeyEvent.VK_SPACE, PlayerAction.DROP_BOMB);
-        keyboardKeys.put(KeyEvent.VK_ALT, PlayerAction.STOP);
-        Consumer<PlayerAction> thisPlayerActionCons = x->thisPlayerAction=x;
-       xbc.addKeyListener(new KeyboardEventHandler(keyboardKeys,thisPlayerActionCons));
-       
+        keyboardKeys.put(KeyEvent.VK_SHIFT, PlayerAction.STOP);
+
+        Consumer<PlayerAction> thisPlayerActionCons = x -> {
+            
+            thisPlayerAction = x;
+            System.out.println(thisPlayerAction);
+            if(!Objects.isNull(thisPlayerAction)){
+                ByteBuffer b = ByteBuffer.allocate(1);
+                b.put((byte)thisPlayerAction.ordinal());
+                b.flip();
+                
+                try {
+                    CHANNEL.send(b, ADDRESS);
+                    System.out.println("action sent "+thisPlayerAction.ordinal());
+                  } 
+                      
+                      catch (IOException e) {
+                    e.printStackTrace();
+                  }
+                
+                thisPlayerAction=null;
+            }
+            
+
+            
+            
+        };
+        xbc.addKeyListener(
+                new KeyboardEventHandler(keyboardKeys, thisPlayerActionCons));
+
         xbc.setSize(xbc.getPreferredSize());
         xbc.setFocusable(true);
         xbc.requestFocusInWindow();
@@ -69,75 +93,83 @@ public class Main {
         jfr.add(xbc);
         jfr.pack();
         jfr.setVisible(true);
-  
-        
-        
-       
         
         
     }
 
     /**
      * main method, useful for the program's correct functioning
+     * 
      * @param args
-     *         the server IP
+     *            the server IP
      * @throws InterruptedException
-     *          an exception
+     *             an exception
      * @throws IOException
-     *          
+     *             an exception
      * @throws InvocationTargetException
      */
     public static void main(String args[]) throws InterruptedException,
-        IOException, InvocationTargetException {
+            IOException, InvocationTargetException {
 
         XBlastComponent xbc = new XBlastComponent();
-        SwingUtilities.invokeAndWait(()-> createUI(xbc));
+        SwingUtilities.invokeAndWait(() -> createUI(xbc));
         GameState gs = null;
 
-        CHANNEL = DatagramChannel
-                .open(StandardProtocolFamily.INET);
-        ADDRESS= new InetSocketAddress(args.length == 0 ? "localhost" : args[0], 2016);
+        CHANNEL = DatagramChannel.open(StandardProtocolFamily.INET);
+        ADDRESS = new InetSocketAddress(
+                args.length == 0 ? "localhost" : args[0], 2016);
         ByteBuffer sendBuffer = ByteBuffer.allocate(1);
         ByteBuffer receiveBuffer = ByteBuffer.allocate(MAXIMUM_SERIALISED_BYTE);
-    
+
         
-        
-        List<Byte> gsList = new ArrayList<>();
         CHANNEL.configureBlocking(false);
-        do  {
-            
-            CHANNEL.receive(receiveBuffer);
-            System.out.println(receiveBuffer.toString()+"111");
-            sendBuffer.clear(); 
+
+        while(Objects.isNull(CHANNEL.receive(receiveBuffer))){
+            System.out.println("isNull");
+            sendBuffer.clear();
             sendBuffer.put((byte) PlayerAction.JOIN_GAME.ordinal());
             sendBuffer.flip();
             CHANNEL.send(sendBuffer, ADDRESS);
             Thread.sleep(Time.CLIENT_WAIT_TIME);
-        }while(receiveBuffer.get(0)==0);
-        
-        System.out.println("END OF WHILE 1");
-//        CHANNEL.configureBlocking(true);
-        while(true){
-            
-            receiveBuffer = ByteBuffer.allocate(MAXIMUM_SERIALISED_BYTE);
-            receiveBuffer.clear();
-            receiveBuffer.rewind();
-            CHANNEL.receive(receiveBuffer);
-            System.out.println(receiveBuffer.toString()+"222");
-            receiveBuffer.rewind();
-            System.out.println(receiveBuffer.toString()+"333");
-            PlayerID myid = PlayerID.values()[receiveBuffer.get()-1];//jeej
-            System.out.println(myid);
-            while (receiveBuffer.hasRemaining()) {
-                gsList.add(receiveBuffer.get());
-            }
-            gs = GameStateDeserializer.deserializeGameState(gsList);
-            xbc.setGameState(gs,myid);
-            gsList.clear();
-            
-            
         }
-    
+
+
+        receiveBuffer.flip();
+
+        List<Byte> gsList = new ArrayList<>();
+
+        while (receiveBuffer.hasRemaining()){
+
+            gsList.add(receiveBuffer.get());
+        }
+        
+
+        PlayerID myid = PlayerID.values()[gsList.get(0)];// here -1 to switch back to 0,1,2,3
+
+        
+        gs = GameStateDeserializer.deserializeGameState(gsList.subList(1, gsList.size()));
+        xbc.setGameState(gs, myid);
+        gsList.clear();
+
+        CHANNEL.configureBlocking(true);
+        while (true) {
+
+            receiveBuffer.clear();
+
+            CHANNEL.receive(receiveBuffer);
+
+            receiveBuffer.flip();
+
+            while (receiveBuffer.hasRemaining())
+                gsList.add(receiveBuffer.get());
+
+            System.out.println(gsList);
+            gs = GameStateDeserializer.deserializeGameState(gsList.subList(1, gsList.size()));
+            xbc.setGameState(gs, myid);
+            gsList.clear();
+
+        }
+
     }
 
 }

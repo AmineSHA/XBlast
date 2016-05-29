@@ -19,10 +19,11 @@ private final List<Image> scoreLine;
 private final List<Image> timeLine;
 
 /**
- * GameState constructor
+ * Client gameState constructor
  * @param players
  * @param boardImages
  * @param bombsAndExplosionsImages
+ *          can contain null
  * @param scoreLine
  * @param timeLine
  */
@@ -128,7 +129,7 @@ public static final class Player{
     }
     /**
      * the position getter
-     * @return the subcell position
+     * @return the subCell position
      */
     public  SubCell position(){
         return position;

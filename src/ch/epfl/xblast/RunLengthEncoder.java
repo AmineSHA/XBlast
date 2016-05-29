@@ -32,27 +32,25 @@ public final class RunLengthEncoder {
             if (b.get(i) < 0)
                 throw new IllegalArgumentException();
             a++;
-       
-             if (!(b.get(i).equals(bCopy.get(i + 1)))) {
+
+            if (!(b.get(i).equals(bCopy.get(i + 1)))) {
                 if (a > 2) {
                     if (a > MAXIMUM_COUNTER) {
                         encodedList.add((byte) (2 - MAXIMUM_COUNTER));
                         encodedList.add(b.get(i));
 
                     }
-                    encodedList.add((byte) (2-(a % MAXIMUM_COUNTER)));
+                    encodedList.add((byte) (2 - (a % MAXIMUM_COUNTER)));
                     encodedList.add(b.get(i));
-              
-                }
-                else {
 
-                    for (int j = 0; j < a; j++) {
+                } else {
+
+                    for (int j = 0; j < a; j++)
                         encodedList.add(b.get(i));
-                    }
+
                 }
                 a = 0;
             }
-           
 
         }
         return encodedList;
@@ -70,19 +68,17 @@ public final class RunLengthEncoder {
         for (int i = 0; i < c.size(); i++) {
 
             if (c.get(i) < 0) {
-                if (i == c.size()) {
+                if (i == c.size())
                     throw new IllegalArgumentException();
-                }
 
-                for (int j = 0; j < (2 - c.get(i)); j++) {
+                for (int j = 0; j < (2 - c.get(i)); j++)
                     decoded.add(c.get(i + 1));
-                }
+
                 ++i;
             }
 
-            else {
+            else
                 decoded.add(c.get(i));
-            }
 
         }
         return decoded;

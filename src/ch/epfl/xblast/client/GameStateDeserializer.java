@@ -44,7 +44,9 @@ public class GameStateDeserializer {
         if (encoded.equals(null)) {
             
         }
+        System.out.println(encoded.get(0));
         int boardListMark = encoded.get(0) + 1;
+        
         int splosionsListMark = encoded.get(boardListMark) + boardListMark + 1;
         int playerPortionSize = PlayerID.values().length
                 * NUMBER_OF_BYTE_PER_PLAYER;

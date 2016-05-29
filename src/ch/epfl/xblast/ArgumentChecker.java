@@ -11,7 +11,7 @@ final public class ArgumentChecker {
     }
 
     /**
-     * verify that the value is positive, if not, well, you get an error
+     * verify that the value is positive (or zero), if not, well, you get an error
      * @param value
      *          the value that will be checked
      * @return the value that was tested
