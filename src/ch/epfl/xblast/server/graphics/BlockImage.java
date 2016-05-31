@@ -1,4 +1,5 @@
 package ch.epfl.xblast.server.graphics;
+
 /**
  * 
  * @author Amine Chaouachi (260709) / Alban Favre (260025)

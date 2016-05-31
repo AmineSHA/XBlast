@@ -52,7 +52,7 @@ public final class Level {
         Block XX = Block.INDESTRUCTIBLE_WALL;
         Block cc = Block.DESTRUCTIBLE_WALL;
         Block __ = Block.FREE;
-        Board b = Board.ofQuadrantNWBlocksWalled(Arrays.asList(
+        Board board = Board.ofQuadrantNWBlocksWalled(Arrays.asList(
 
                 Arrays.asList(__, __, __, __, __, cc, __),
                 Arrays.asList(__, XX, cc, XX, cc, XX, cc),
@@ -61,14 +61,14 @@ public final class Level {
                 Arrays.asList(__, cc, __, cc, __, __, __),
                 Arrays.asList(cc, XX, cc, XX, cc, XX, __)));
 
-        List<Player> p = new ArrayList<Player>();
-        p.add(new Player(PlayerID.PLAYER_1, 3, new Cell(1, 1), 2, 3));
-        p.add(new Player(PlayerID.PLAYER_2, 3, new Cell(13, 1), 2, 3));
-        p.add(new Player(PlayerID.PLAYER_3, 3, new Cell(13, 11), 2, 3));
-        p.add(new Player(PlayerID.PLAYER_4, 3, new Cell(1, 11), 2, 3));
+        List<Player> players = new ArrayList<Player>();
+        players.add(new Player(PlayerID.PLAYER_1, 3, new Cell(1, 1), 2, 3));
+        players.add(new Player(PlayerID.PLAYER_2, 3, new Cell(13, 1), 2, 3));
+        players.add(new Player(PlayerID.PLAYER_3, 3, new Cell(13, 11), 2, 3));
+        players.add(new Player(PlayerID.PLAYER_4, 3, new Cell(1, 11), 2, 3));
 
         return new Level(new BoardPainter(palette, BlockImage.IRON_FLOOR_S),
-                new GameState(b, p));
+                new GameState(board, players));
 
     }
 

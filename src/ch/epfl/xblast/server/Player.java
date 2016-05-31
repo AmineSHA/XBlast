@@ -26,7 +26,7 @@ final public class Player {
     @Override
     public String toString() {
         return "( " + id + ", " + lifeStates.head() + " ," + directedPos.head()
-        + " ," + maxBombs + " ," + bombRange + ")";
+                + " ," + maxBombs + " ," + bombRange + ")";
     }
 
     /**

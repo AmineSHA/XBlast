@@ -1,6 +1,7 @@
 package ch.epfl.xblast.server;
 
 import ch.epfl.xblast.Time;
+
 /**
  * 
  * @author Amine Chaouachi (260709) / Alban Favre (260025)
@@ -40,10 +41,11 @@ public interface Ticks {
     /**
      * the ticks per nanosecond
      */
-    public static int TICK_NANOSECOND_DURATION = (Time.NS_PER_S)/TICKS_PER_SECOND;
+    public static int TICK_NANOSECOND_DURATION = (Time.NS_PER_S)
+            / TICKS_PER_SECOND;
     /**
      * the ticks total
      */
-    public static int TOTAL_TICKS= 120*TICKS_PER_SECOND;
+    public static int TOTAL_TICKS = 120 * TICKS_PER_SECOND;
 
 }

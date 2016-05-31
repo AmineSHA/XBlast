@@ -44,7 +44,7 @@ public final class XBlastComponent extends JComponent {
         for (int i = 0; i < gs.boardImages().size(); i++) {
             
             g.drawImage(gs.boardImages().get(i), cumulativeCoordX, cumulativeCoordY, null);
-            if (i<=gs.bombsAndExplosionsImage().size()&&gs.bombsAndExplosionsImage().get(i) != null)
+            if (i<=gs.bombsAndExplosionsImage().size()&&gs.bombsAndExplosionsImage().get(i) != null)//TODO cette 2 eme conditions est une astuce cheap
                 g.drawImage(gs.bombsAndExplosionsImage().get(i),
                         cumulativeCoordX, cumulativeCoordY, null);
             
@@ -89,7 +89,7 @@ public final class XBlastComponent extends JComponent {
             cumulativeCoordX += gs.timeLine().get(i).getWidth(null);
 
         }
-        // PLAYAS
+        // Players
         List<Player> playersCopy = new ArrayList<Player>(gs.players());
 
         Comparator<Player> sameVertCordCriteria = (a, b) -> a.id() == this.id ? -1

@@ -86,7 +86,6 @@ public final class GameStateSerializer {
 
         ByteList.add((byte) Math.ceil(gs.remainingTime() / 2));
 
-
         return ByteList;
 
     }

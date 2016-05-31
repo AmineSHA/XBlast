@@ -1,11 +1,12 @@
 package ch.epfl.xblast.server;
 
 import ch.epfl.cs108.*;
+
 import ch.epfl.xblast.*;
 import ch.epfl.xblast.server.Player.DirectedPosition;
 import ch.epfl.xblast.server.Player.LifeState;
 import ch.epfl.xblast.server.Player.LifeState.State;
-import ch.epfl.xblast.server.debug.Timer;
+
 
 import java.util.*;
 
@@ -225,13 +226,11 @@ final public class GameState {
         Set<Cell> BlastedCells1 = new HashSet<>();
         for (Sq<Cell> c : blasts1)
             BlastedCells1.add(c.head());
-        
+
         /*
-         * playerBonuses1 is used
-         * for nextplayer
+         * playerBonuses1 is used for nextplayer
          */
         Map<PlayerID, Bonus> playerBonuses1 = new HashMap<>();
-       
 
         Set<Cell> consumedBonuses = new HashSet<>();
         for (Player p : players) {
@@ -243,7 +242,7 @@ final public class GameState {
                         board.blockAt(sub.containingCell()).associatedBonus());
             }
         }
-        
+
         Board board1 = nextBoard(this.board, consumedBonuses, BlastedCells1);
 
         List<Sq<Sq<Cell>>> explosions1 = nextExplosions(this.explosions);
@@ -268,7 +267,6 @@ final public class GameState {
         List<Player> Player1 = nextPlayers(this.players, playerBonuses1,
                 bombedCells1Set, board1, BlastedCells1, speedChangeEvents);
 
-        
         return new GameState(this.ticks + 1, board1, Player1, bombs1,
                 explosions1, blasts1);
 
@@ -296,7 +294,8 @@ final public class GameState {
                 blasts1.add(r.tail());
 
         for (Sq<Sq<Cell>> f : explosions0)
-            if (!f.head().isEmpty() && board0.blockAt(f.head().head()).canHostPlayer())
+            if (!f.head().isEmpty()
+                    && board0.blockAt(f.head().head()).canHostPlayer())
                 blasts1.add(f.head());
 
         return blasts1;
@@ -347,10 +346,9 @@ final public class GameState {
                                 Block.CRUMBLING_WALL)
                         .concat(generateRandomSequence()));
 
-            else if (board0.blockAt(c).isBonus()
-                    && blastedCells1.contains(c))
-                boardArgument.add(
-                        board0.blocksAt(c).tail().limit(Ticks.BONUS_DISAPPEARING_TICKS)
+            else if (board0.blockAt(c).isBonus() && blastedCells1.contains(c))
+                boardArgument.add(board0.blocksAt(c).tail()
+                        .limit(Ticks.BONUS_DISAPPEARING_TICKS)
                         .concat(Sq.constant(Block.FREE)));
 
             else
@@ -411,8 +409,8 @@ final public class GameState {
 
                     else
                         dirPosSeq = DirectedPosition
-                        .moving(new DirectedPosition(c.position(),
-                                speedChangeEvents.get(id).get()));
+                                .moving(new DirectedPosition(c.position(),
+                                        speedChangeEvents.get(id).get()));
                     // goes forward or backwards
 
                 }
@@ -424,7 +422,7 @@ final public class GameState {
                      */
 
                     dirPosSeq = takewhileMeth(dirPosSeq)
-                    .concat(DirectedPosition.stopped(cent));
+                            .concat(DirectedPosition.stopped(cent));
 
             }
             if (!isBlockedMeth(board1, c, dirPosSeq.head().direction(),
@@ -476,19 +474,19 @@ final public class GameState {
             if (bombDropEvents.contains(t.id()))
                 if (t.lifeState().canMove()) {
                     int currentBombNumberPlayer = 0;/*
-                     * a dying player or a dead
-                     * player cannot drop bomb
-                     */
+                                                     * a dying player or a dead
+                                                     * player cannot drop bomb
+                                                     */
                     for (Bomb b : bombs0) {
                         if (b.ownerId() == t.id())
                             currentBombNumberPlayer += 1;
 
                         if (b.position().equals(t.position().containingCell()))
                             currentBombNumberPlayer = t
-                            .maxBombs();/*
-                             * a player cannot put a second
-                             * bomb on the same cell
-                             */
+                                    .maxBombs();/*
+                                                 * a player cannot put a second
+                                                 * bomb on the same cell
+                                                 */
 
                     }
                     if (t.maxBombs() > currentBombNumberPlayer)
@@ -508,7 +506,7 @@ final public class GameState {
                             permutatedIds.size());
                     if (permutatedIds.get(chosenIndex)
                             .indexOf(h.id()) < permutatedIds.get(chosenIndex)
-                            .indexOf(g.id()))
+                                    .indexOf(g.id()))
                         endBombermen.remove(g);
 
                     else
@@ -552,14 +550,12 @@ final public class GameState {
     }
 
     /**
-     * applies takeWhile
-     * (we created this method for 2 raisons:
-     * 1: it makes the code lighter
-     * 2: for some reason, using sq.takeWhile 
-     * in a for each loop made the object (in nextPlayer it's c)
-     * unusable, we found it easier to just get sq.takeWhile out of
-     * the for each loop, than reworking our code without a
-     * for each loop)
+     * applies takeWhile (we created this method for 2 raisons: 1: it makes the
+     * code lighter 2: for some reason, using sq.takeWhile in a for each loop
+     * made the object (in nextPlayer it's c) unusable, we found it easier to
+     * just get sq.takeWhile out of the for each loop, than reworking our code
+     * without a for each loop)
+     * 
      * @param j
      * @return Sq<DirectedPosition>
      */
@@ -568,14 +564,12 @@ final public class GameState {
     }
 
     /**
-     * applies findFirst
-     * (we created this method for 2 raisons:
-     * 1: it makes the code lighter
-     * 2: for some reason, using sq.findFirst
-     * in a for each loop made the object (in nextPlayer it's c)
-     * unusable, we found it easier to just get sq.findFirst out of
-     * the for each loop, than reworking our code without a
-     * for each loop)
+     * applies findFirst (we created this method for 2 raisons: 1: it makes the
+     * code lighter 2: for some reason, using sq.findFirst in a for each loop
+     * made the object (in nextPlayer it's c) unusable, we found it easier to
+     * just get sq.findFirst out of the for each loop, than reworking our code
+     * without a for each loop)
+     * 
      * @param j
      * @return DirectedPosition
      */

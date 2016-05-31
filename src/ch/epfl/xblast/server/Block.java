@@ -70,7 +70,8 @@ public enum Block {
      * @return true if it can cast shadows
      */
     public boolean castsShadow() {
-        return this==CRUMBLING_WALL||this==DESTRUCTIBLE_WALL||this==Block.INDESTRUCTIBLE_WALL;
+        return this == CRUMBLING_WALL || this == DESTRUCTIBLE_WALL
+                || this == Block.INDESTRUCTIBLE_WALL;
     }
 
     /**
@@ -79,7 +80,7 @@ public enum Block {
      * @return true if it's a bonus
      */
     public boolean isBonus() {
-        return this==Block.BONUS_RANGE||this==BONUS_BOMB;
+        return this == Block.BONUS_RANGE || this == BONUS_BOMB;
     }
 
     /**

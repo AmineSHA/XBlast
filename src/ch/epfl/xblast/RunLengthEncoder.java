@@ -43,7 +43,9 @@ public final class RunLengthEncoder {
                     encodedList.add((byte) (2 - (a % MAXIMUM_COUNTER)));
                     encodedList.add(b.get(i));
 
-                } else {
+                }
+
+                else {
 
                     for (int j = 0; j < a; j++)
                         encodedList.add(b.get(i));

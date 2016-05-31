@@ -1,6 +1,7 @@
 package ch.epfl.xblast.client;
 
 import java.util.List;
+
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -21,9 +22,8 @@ import javax.swing.SwingUtilities;
 import ch.epfl.xblast.PlayerID;
 import ch.epfl.xblast.Time;
 import ch.epfl.xblast.client.GameStateDeserializer;
-import ch.epfl.xblast.server.Level;
+
 import ch.epfl.xblast.PlayerAction;
-import ch.epfl.xblast.server.graphics.BoardPainter;
 
 /**
  * 
@@ -34,16 +34,16 @@ public class Main {
 
     private static DatagramChannel CHANNEL;
     private static SocketAddress ADDRESS;
-    private static int MAXIMUM_SERIALISED_BYTE = 420;
+    private static final int HIGHEST_SERIALISED_BYTE = 420;
+    private static final int PORT = 2016;
 
-    private static BoardPainter bp = Level.DEFAULT_LEVEL.boardPainter();
     private static PlayerAction thisPlayerAction = null;
 
     /**
      * Used to display
      * 
      * @param xbc
-     *            xblastcomponent
+     *            XBlastComponent
      */
     public static void createUI(XBlastComponent xbc) {
 
@@ -56,29 +56,26 @@ public class Main {
         keyboardKeys.put(KeyEvent.VK_SHIFT, PlayerAction.STOP);
 
         Consumer<PlayerAction> thisPlayerActionCons = x -> {
-            
-            thisPlayerAction = x;
-            System.out.println(thisPlayerAction);
-            if(!Objects.isNull(thisPlayerAction)){
-                ByteBuffer b = ByteBuffer.allocate(1);
-                b.put((byte)thisPlayerAction.ordinal());
-                b.flip();
-                
-                try {
-                    CHANNEL.send(b, ADDRESS);
-                    System.out.println("action sent "+thisPlayerAction.ordinal());
-                  } 
-                      
-                      catch (IOException e) {
-                    e.printStackTrace();
-                  }
-                
-                thisPlayerAction=null;
-            }
-            
 
-            
-            
+            thisPlayerAction = x;
+
+            if (!Objects.isNull(thisPlayerAction)) {
+                ByteBuffer actionBuffer = ByteBuffer.allocate(1);
+                actionBuffer.put((byte) thisPlayerAction.ordinal());
+                actionBuffer.flip();
+
+                try {
+                    CHANNEL.send(actionBuffer, ADDRESS);
+
+                }
+
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                thisPlayerAction = null;
+            }
+
         };
         xbc.addKeyListener(
                 new KeyboardEventHandler(keyboardKeys, thisPlayerActionCons));
@@ -93,20 +90,20 @@ public class Main {
         jfr.add(xbc);
         jfr.pack();
         jfr.setVisible(true);
-        
-        
+
     }
 
     /**
      * main method, useful for the program's correct functioning
      * 
      * @param args
-     *            the server IP
+     *            the server IP (or nothing if server is localHost)
      * @throws InterruptedException
      *             an exception
      * @throws IOException
      *             an exception
      * @throws InvocationTargetException
+     *             an exception
      */
     public static void main(String args[]) throws InterruptedException,
             IOException, InvocationTargetException {
@@ -117,15 +114,14 @@ public class Main {
 
         CHANNEL = DatagramChannel.open(StandardProtocolFamily.INET);
         ADDRESS = new InetSocketAddress(
-                args.length == 0 ? "localhost" : args[0], 2016);
+                args.length == 0 ? "localhost" : args[0], PORT);
         ByteBuffer sendBuffer = ByteBuffer.allocate(1);
-        ByteBuffer receiveBuffer = ByteBuffer.allocate(MAXIMUM_SERIALISED_BYTE);
+        ByteBuffer receiveBuffer = ByteBuffer.allocate(HIGHEST_SERIALISED_BYTE);
 
-        
         CHANNEL.configureBlocking(false);
 
-        while(Objects.isNull(CHANNEL.receive(receiveBuffer))){
-            System.out.println("isNull");
+        while (Objects.isNull(CHANNEL.receive(receiveBuffer))) {
+
             sendBuffer.clear();
             sendBuffer.put((byte) PlayerAction.JOIN_GAME.ordinal());
             sendBuffer.flip();
@@ -138,16 +134,14 @@ public class Main {
 
         List<Byte> gsList = new ArrayList<>();
 
-        while (receiveBuffer.hasRemaining()){
-
+        while (receiveBuffer.hasRemaining())
             gsList.add(receiveBuffer.get());
-        }
-        
 
-        PlayerID myid = PlayerID.values()[gsList.get(0)];// here -1 to switch back to 0,1,2,3
+        PlayerID myid = PlayerID.values()[gsList.get(0)];
 
-        
-        gs = GameStateDeserializer.deserializeGameState(gsList.subList(1, gsList.size()));
+        System.out.println(gsList);
+        gs = GameStateDeserializer
+                .deserializeGameState(gsList.subList(1, gsList.size()));
         xbc.setGameState(gs, myid);
         gsList.clear();
 
@@ -163,8 +157,8 @@ public class Main {
             while (receiveBuffer.hasRemaining())
                 gsList.add(receiveBuffer.get());
 
-            System.out.println(gsList);
-            gs = GameStateDeserializer.deserializeGameState(gsList.subList(1, gsList.size()));
+            gs = GameStateDeserializer
+                    .deserializeGameState(gsList.subList(1, gsList.size()));
             xbc.setGameState(gs, myid);
             gsList.clear();
 
