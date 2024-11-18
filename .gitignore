@@ -5,3 +5,4 @@ images/
 test/
 /sq.jar
 /.classpath/
+.vscode/

@@ -42,8 +42,8 @@ public final class Timer {
         if (diff1 > max && max > 0 && time1 >0 ) {
             System.out.println(
                     String.format("this was a controlled crash at stop %d, a lap took longer than expected, so we crashed the app for you to follow the stack dump and figure out where it crashed exactly.",lapCount-1));
-            int[] array = new int[1];
-            int i = array[3];
+            
+            
 
         }
         time1 = System.currentTimeMillis();

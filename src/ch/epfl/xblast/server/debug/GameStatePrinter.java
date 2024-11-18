@@ -1,10 +1,9 @@
 package ch.epfl.xblast.server.debug;
 
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.epfl.cs108.Sq;
 import ch.epfl.xblast.Cell;
 import ch.epfl.xblast.SubCell;
 import ch.epfl.xblast.server.Block;

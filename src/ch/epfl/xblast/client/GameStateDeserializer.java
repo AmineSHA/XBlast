@@ -1,17 +1,15 @@
 package ch.epfl.xblast.client;
 
-import java.awt.Image;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import ch.epfl.xblast.Cell;
 import ch.epfl.xblast.PlayerID;
 import ch.epfl.xblast.RunLengthEncoder;
 import ch.epfl.xblast.SubCell;
 import ch.epfl.xblast.client.GameState.Player;
+import java.awt.Image;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 
@@ -51,7 +49,7 @@ public class GameStateDeserializer {
      * @return a deserialised gameState
      */
     public static GameState deserializeGameState(List<Byte> encoded) {
-        if (encoded.equals(null)) {
+        if (encoded==null) {
             return null;
         }
         int boardListMark = encoded.get(0) + 1;
@@ -121,7 +119,7 @@ public class GameStateDeserializer {
             board[Cell.SPIRAL_ORDER.get(i).rowMajorIndex()] = BoardCollection
                     .image(decodedBoard.get(i));
 
-        return new ArrayList<Image>(Arrays.asList(board));
+        return new ArrayList<>(Arrays.asList(board));
 
     }
 

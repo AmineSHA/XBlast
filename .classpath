@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17"/>
 	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="images"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="sq.jar"/>
+	<classpathentry kind="lib" path="c:/Users/amine/Documents/RUNT/sq.jar"/>
+	<classpathentry kind="lib" path="c:/Users/amine/.vscode/extensions/redhat.java-1.36.0-win32-x64/server/plugins/org.junit_4.13.2.v20240929-1000.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://junit.org/junit4/javadoc/latest/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/amine/.vscode/extensions/redhat.java-1.36.0-win32-x64/server/plugins/org.hamcrest_3.0.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

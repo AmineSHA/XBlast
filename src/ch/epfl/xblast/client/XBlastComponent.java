@@ -1,18 +1,16 @@
 package ch.epfl.xblast.client;
 
+import ch.epfl.xblast.Cell;
+import ch.epfl.xblast.PlayerID;
+import ch.epfl.xblast.client.GameState.Player;
 import java.awt.*;
-
-
-import javax.swing.JComponent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.ArrayList;
-import ch.epfl.xblast.PlayerID;
-import ch.epfl.xblast.client.GameState.Player;
-import ch.epfl.xblast.Cell;
+import javax.swing.JComponent;
 /**
  * 
  * @author Amine Chaouachi (260709) / Alban Favre (260025)
@@ -25,13 +23,13 @@ public final class XBlastComponent extends JComponent {
 
     private GameState gs=null;
     private PlayerID id;
-    private List<Integer> textPoss = new ArrayList<>(Arrays.asList(96, 240, 768, 912));
+    final private List<Integer> textPoss = new ArrayList<>(Arrays.asList(96, 240, 768, 912));
 
-    public Dimension getPreferredSize() {
+    @Override public Dimension getPreferredSize() {
         return new Dimension(960, 688);
     }
 
-    protected void paintComponent(Graphics g0) {
+    @Override protected void paintComponent(Graphics g0) {
            if(Objects.isNull(gs))
                 return;
            
@@ -44,7 +42,7 @@ public final class XBlastComponent extends JComponent {
         for (int i = 0; i < gs.boardImages().size(); i++) {
             
             g.drawImage(gs.boardImages().get(i), cumulativeCoordX, cumulativeCoordY, null);
-            if (i<=gs.bombsAndExplosionsImage().size()&&gs.bombsAndExplosionsImage().get(i) != null)//TODO cette 2 eme conditions est une astuce cheap
+            if (i<=gs.bombsAndExplosionsImage().size()&&gs.bombsAndExplosionsImage().get(i) != null)
                 g.drawImage(gs.bombsAndExplosionsImage().get(i),
                         cumulativeCoordX, cumulativeCoordY, null);
             
@@ -63,6 +61,7 @@ public final class XBlastComponent extends JComponent {
           
             g.drawImage(gs.scoreLine().get(i), cumulativeCoordX, cumulativeCoordY, null);
             cumulativeCoordX += gs.scoreLine().get(i).getWidth(null);
+            
             if(i==gs.scoreLine().size()-1){
                 cumulativeCoordY+=gs.scoreLine().get(i).getHeight(null);
                 cumulativeCoordX = 0;
@@ -90,7 +89,7 @@ public final class XBlastComponent extends JComponent {
 
         }
         // Players
-        List<Player> playersCopy = new ArrayList<Player>(gs.players());
+        List<Player> playersCopy = new ArrayList<>(gs.players());
 
         Comparator<Player> sameVertCordCriteria = (a, b) -> a.id() == this.id ? -1
                 : b.id() == this.id ? 1 : 0;

@@ -1,7 +1,8 @@
 package ch.epfl.xblast.client;
 
-import java.util.List;
-
+import ch.epfl.xblast.PlayerAction;
+import ch.epfl.xblast.PlayerID;
+import ch.epfl.xblast.Time;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -12,18 +13,12 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
-
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-
-import ch.epfl.xblast.PlayerID;
-import ch.epfl.xblast.Time;
-import ch.epfl.xblast.client.GameStateDeserializer;
-
-import ch.epfl.xblast.PlayerAction;
 
 /**
  * 
@@ -110,7 +105,7 @@ public class Main {
 
         XBlastComponent xbc = new XBlastComponent();
         SwingUtilities.invokeAndWait(() -> createUI(xbc));
-        GameState gs = null;
+        GameState gs;
 
         CHANNEL = DatagramChannel.open(StandardProtocolFamily.INET);
         ADDRESS = new InetSocketAddress(

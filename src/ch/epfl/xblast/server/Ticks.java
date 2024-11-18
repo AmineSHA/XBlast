@@ -37,7 +37,7 @@ public interface Ticks {
     /**
      * the ticks per second
      */
-    public static int TICKS_PER_SECOND = 20;
+    public static int TICKS_PER_SECOND = 40;
     /**
      * the ticks per nanosecond
      */

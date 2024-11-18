@@ -108,7 +108,7 @@ public class RandomGameClientWithJframe {
             }
             
             catch (InterruptedException e) {
-                // TODO Auto-generated catch block
+                
                 e.printStackTrace();
             }
 
@@ -125,7 +125,7 @@ public class RandomGameClientWithJframe {
         } 
         
         catch (InterruptedException e) {
-            // TODO Auto-generated catch block
+            
             e.printStackTrace();
         }
         jfr.dispose();

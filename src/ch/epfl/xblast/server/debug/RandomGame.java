@@ -42,7 +42,7 @@ public class RandomGame {
             try {
                 Thread.sleep(1000 / Ticks.TICKS_PER_SECOND);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
+                
                 e.printStackTrace();
             }
         }
